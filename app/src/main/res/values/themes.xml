@@ -1,0 +1,26 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.PurrfectStore2" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/vainilla_pastel</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <item name="colorControlNormal">@color/black</item>
+
+        <item name="materialAlertDialogTheme">@style/App.MaterialAlertDialog</item>
+    </style>
+
+    <style name="Theme.PurrfectStore2" parent="Base.Theme.PurrfectStore2" />
+
+    <style name="App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/black</item>
+    </style>
+
+    <style name="Theme.PurrfectStore2.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.PurrfectStore2.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.PurrfectStore2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

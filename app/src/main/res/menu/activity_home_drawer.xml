@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+ <group
+        android:id="@+id/group_user_nav"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/profileFragment"
+            android:icon="@drawable/ic_menu_profile"
+            android:title="Perfil" />
+        <item
+            android:id="@+id/productFragment"
+            android:icon="@drawable/ic_menu_products"
+            android:title="Productos" />
+        <item
+            android:id="@+id/nav_Cart"
+            android:icon="@drawable/ic_menu_cart"
+            android:title="Carrito" />
+    </group>
+    <group
+        android:id="@+id/group_admin"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/addProductFragment"
+            android:icon="@drawable/ic_menu_add"
+            android:title="Añadir Producto" />
+        <item
+            android:id="@+id/nav_modify_product"
+            android:icon="@drawable/ic_menu_edit"
+            android:title="Modificar Producto" />
+        <item
+            android:id="@+id/nav_delete_product"
+            android:icon="@drawable/ic_menu_delete"
+            android:title="Eliminar Producto" />
+    </group>
+
+    <group android:id="@+id/group_account">
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_menu_logout"
+            android:textColor="#FF0000"
+            android:title="Cerrar Sesión" />
+    </group>
+
+</menu>
