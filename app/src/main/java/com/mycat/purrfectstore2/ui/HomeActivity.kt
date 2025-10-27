@@ -25,22 +25,23 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
         val navController: NavController = navHostFragment.navController
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
-                R.id.addProductFragment, R.id.modifyListFragment, R.id.nav_delete_product
+                R.id.addProductFragment, R.id.modifyListFragment, R.id.deleteProductFragment,
+                R.id.myOrdersFragment, R.id.usersOrderListFragment, R.id.usersListFragment,
+                R.id.BannedUsersListFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.toolbar.post {
-            val blackColor = resources.getColor(R.color.black, theme)
-            binding.toolbar.navigationIcon?.setTint(blackColor)
-        }
+
         navView.setNavigationItemSelectedListener { menuItem ->
             binding.drawerLayout.closeDrawers()
             when (menuItem.itemId) {

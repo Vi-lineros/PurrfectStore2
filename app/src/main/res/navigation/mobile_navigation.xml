@@ -84,4 +84,28 @@
         android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderFragment"
         android:label="Pedido del usuario"
         tools:layout="@layout/fragment_user_order" />
+    <fragment
+        android:id="@+id/myOrdersFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.MyOrdersFragment"
+        android:label="Mis pedidos"
+        tools:layout="@layout/fragment_my_orders" />
+    <fragment
+        android:id="@+id/usersListFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.UsersListFragment"
+        android:label="Usuarios Registrados"
+        tools:layout="@layout/fragment_users_list" >
+        <action
+            android:id="@+id/action_usersList_to_userProfile"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.UserProfileFragment"
+        android:label="Perfil del Usuario"
+        tools:layout="@layout/fragment_user_profile" />
+    <fragment
+        android:id="@+id/BannedUsersListFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.BannedUsersListFragment"
+        android:label="Usuarios Baneados"
+        tools:layout="@layout/fragment_banned_users_list" />
 </navigation>

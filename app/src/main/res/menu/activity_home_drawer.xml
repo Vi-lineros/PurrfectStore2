@@ -13,11 +13,11 @@
             android:icon="@drawable/ic_menu_products"
             android:title="Productos" />
         <item
-            android:id="@+id/nav_Cart"
+            android:id="@+id/cartFragment"
             android:icon="@drawable/ic_menu_cart"
             android:title="Carrito" />
         <item
-            android:id="@+id/orders"
+            android:id="@+id/myOrdersFragment"
             android:icon="@drawable/ic_menu_orders"
             android:title="Mis Pedidos" />
     </group>
@@ -33,11 +33,11 @@
             android:icon="@drawable/ic_menu_edit"
             android:title="Modificar Producto" />
         <item
-            android:id="@+id/nav_delete_product"
+            android:id="@+id/deleteProductFragment"
             android:icon="@drawable/ic_menu_delete"
             android:title="Eliminar Producto" />
         <item
-            android:id="@+id/confirmarPedidos"
+            android:id="@+id/usersOrderListFragment"
             android:icon="@drawable/ic_menu_confirm_order"
             android:title="Pedidos pendientes" />
     </group>
@@ -45,11 +45,11 @@
         android:id="@+id/group_admin_accounts"
         android:checkableBehavior="single">
     <item
-        android:id="@+id/users"
+        android:id="@+id/usersListFragment"
         android:icon="@drawable/ic_menu_users"
         android:title="Usuarios registrados" />
     <item
-        android:id="@+id/bannedUsers"
+        android:id="@+id/BannedUsersListFragment"
         android:icon="@drawable/ic_menu_ban"
         android:title="Usuarios bloqueados" />
     </group>
