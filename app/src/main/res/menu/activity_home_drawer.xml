@@ -16,6 +16,10 @@
             android:id="@+id/nav_Cart"
             android:icon="@drawable/ic_menu_cart"
             android:title="Carrito" />
+        <item
+            android:id="@+id/orders"
+            android:icon="@drawable/ic_menu_orders"
+            android:title="Mis Pedidos" />
     </group>
     <group
         android:id="@+id/group_admin"
@@ -33,19 +37,19 @@
             android:icon="@drawable/ic_menu_delete"
             android:title="Eliminar Producto" />
         <item
-            android:id="@id/confirmarPedidos"
+            android:id="@+id/confirmarPedidos"
             android:icon="@drawable/ic_menu_confirm_order"
             android:title="Pedidos pendientes" />
     </group>
     <group
-        android:id="+id/group_admin_accounts"
+        android:id="@+id/group_admin_accounts"
         android:checkableBehavior="single">
     <item
         android:id="@+id/users"
         android:icon="@drawable/ic_menu_users"
         android:title="Usuarios registrados" />
     <item
-        android:id="@id/bannedUsers"
+        android:id="@+id/bannedUsers"
         android:icon="@drawable/ic_menu_ban"
         android:title="Usuarios bloqueados" />
     </group>

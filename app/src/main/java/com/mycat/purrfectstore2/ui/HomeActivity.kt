@@ -32,8 +32,8 @@ class HomeActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.productFragment, R.id.profileFragment, R.id.nav_Cart,
-                R.id.addProductFragment, R.id.nav_modify_product, R.id.nav_delete_product
+                R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
+                R.id.addProductFragment, R.id.modifyListFragment, R.id.nav_delete_product
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

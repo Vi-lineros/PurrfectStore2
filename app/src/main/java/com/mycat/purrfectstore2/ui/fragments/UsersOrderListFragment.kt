@@ -1,10 +1,11 @@
-package com.mycat.purrfectstore2
+package com.mycat.purrfectstore2.ui.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.mycat.purrfectstore2.R
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -13,10 +14,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [Nav_Delete_Product.newInstance] factory method to
+ * Use the [UsersOrderFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class Nav_Delete_Product : Fragment() {
+class UsersOrderListFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -34,7 +35,7 @@ class Nav_Delete_Product : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nav__delete__product, container, false)
+        return inflater.inflate(R.layout.fragment_users_order_list, container, false)
     }
 
     companion object {
@@ -44,12 +45,12 @@ class Nav_Delete_Product : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment Nav_Delete_Product.
+         * @return A new instance of fragment UsersOrderFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            Nav_Delete_Product().apply {
+            UsersOrderListFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

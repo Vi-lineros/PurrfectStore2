@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.UploadService
-import com.mycat.purrfectstore2.databinding.FragmentNavAddProductBinding
+import com.mycat.purrfectstore2.databinding.FragmentAddProductBinding
 import com.mycat.purrfectstore2.model.CreateProductRequest
 import com.mycat.purrfectstore2.model.ProductImage
 import com.mycat.purrfectstore2.ui.adapter.ImagePreviewAdapter
@@ -25,7 +25,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
 
 class AddProductFragment : Fragment() {
-    private var _binding: FragmentNavAddProductBinding? = null
+    private var _binding: FragmentAddProductBinding? = null
     private val binding get() = _binding!!
     private val selectedImageUris = mutableListOf<Uri>()
     private lateinit var imageAdapter: ImagePreviewAdapter
@@ -44,7 +44,7 @@ class AddProductFragment : Fragment() {
         }
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentNavAddProductBinding.inflate(inflater, container, false)
+        _binding = FragmentAddProductBinding.inflate(inflater, container, false)
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
