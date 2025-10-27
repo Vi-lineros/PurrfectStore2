@@ -25,13 +25,29 @@
             android:icon="@drawable/ic_menu_add"
             android:title="Añadir Producto" />
         <item
-            android:id="@+id/nav_modify_product"
+            android:id="@+id/modifyListFragment"
             android:icon="@drawable/ic_menu_edit"
             android:title="Modificar Producto" />
         <item
             android:id="@+id/nav_delete_product"
             android:icon="@drawable/ic_menu_delete"
             android:title="Eliminar Producto" />
+        <item
+            android:id="@id/confirmarPedidos"
+            android:icon="@drawable/ic_menu_confirm_order"
+            android:title="Pedidos pendientes" />
+    </group>
+    <group
+        android:id="+id/group_admin_accounts"
+        android:checkableBehavior="single">
+    <item
+        android:id="@+id/users"
+        android:icon="@drawable/ic_menu_users"
+        android:title="Usuarios registrados" />
+    <item
+        android:id="@id/bannedUsers"
+        android:icon="@drawable/ic_menu_ban"
+        android:title="Usuarios bloqueados" />
     </group>
 
     <group android:id="@+id/group_account">

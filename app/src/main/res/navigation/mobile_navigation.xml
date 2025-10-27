@@ -5,7 +5,15 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@id/productFragment"
     tools:layout="@layout/fragment_product" >
-
+    <fragment
+            android:id="@+id/modifyListFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.ModifyListFragment"
+        android:label="Lista de productos"
+        tools:layout="@layout/fragment_modify_list" >
+        <action
+            android:id="@+id/action_modifyListFragment_to_modifyProductFragment"
+            app:destination="@id/modifyProductFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProfileFragment"
@@ -31,10 +39,14 @@
         android:label="Añadir Producto"
         tools:layout="@layout/fragment_nav__add__product" />
     <fragment
-        android:id="@+id/nav_modify_product"
-        android:name="com.mycat.purrfectstore2.Nav_Modify_Product"
+        android:id="@+id/modifyProductFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.ModifyProductFragment"
         android:label="Modificar Producto"
-        tools:layout="@layout/fragment_nav__modify__product" />
+        tools:layout="@layout/fragment_modify_product" >
+        <argument
+            android:name="productId"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/nav_delete_product"
         android:name="com.mycat.purrfectstore2.Nav_Delete_Product"
