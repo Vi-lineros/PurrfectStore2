@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.databinding.FragmentProductBinding
@@ -22,6 +23,7 @@ class ProductFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var productAdapter: ProductAdapter
     private var allProducts: List<Product> = emptyList()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,19 +31,25 @@ class ProductFragment : Fragment() {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupSearch()
         loadProducts()
     }
+
     private fun setupRecyclerView() {
-        productAdapter = ProductAdapter()
+        productAdapter = ProductAdapter { product ->
+            val action = ProductFragmentDirections.actionNavProductToNavProductDetails2(product.id)
+            findNavController().navigate(action)
+        }
         binding.recyclerViewProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = productAdapter
         }
     }
+
     private fun setupSearch() {
         binding.searchViewProducts.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -49,12 +57,14 @@ class ProductFragment : Fragment() {
                 binding.searchViewProducts.clearFocus()
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 filter(newText)
                 return true
             }
         })
     }
+
     private fun filter(query: String?) {
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
         val filteredList = if (normalizedQuery.isBlank()) {
@@ -66,6 +76,7 @@ class ProductFragment : Fragment() {
         }
         productAdapter.updateData(filteredList)
     }
+
     private fun loadProducts() {
         binding.progressBar.visibility = View.VISIBLE
         viewLifecycleOwner.lifecycleScope.launch {
@@ -84,6 +95,7 @@ class ProductFragment : Fragment() {
             }
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

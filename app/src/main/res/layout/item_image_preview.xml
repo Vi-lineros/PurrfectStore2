@@ -1,34 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:layout_marginEnd="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/imageViewPreview"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
+        android:background="@color/cardview_dark_background"/>
 
-        <ImageView
-            android:id="@+id/imageViewPreview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:contentDescription="Previsualización de imagen"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+    <ImageButton
+        android:id="@+id/buttonDeleteImage"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_delete" />
 
-        <ImageButton
-            android:id="@+id/buttonRemoveImage"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="top|end"
-            android:layout_margin="4dp"
-            android:background="@drawable/background_circle_semi_transparent"
-            android:src="@drawable/ic_close"
-            app:tint="@android:color/white"
-            android:contentDescription="Eliminar imagen" />
-    </FrameLayout>
-</androidx.cardview.widget.CardView>
+</FrameLayout>

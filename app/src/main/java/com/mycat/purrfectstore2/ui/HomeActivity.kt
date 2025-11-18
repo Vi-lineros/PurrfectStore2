@@ -1,21 +1,22 @@
 package com.mycat.purrfectstore2.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.mycat.purrfectstore2.R
-import com.mycat.purrfectstore2.databinding.ActivityHomeBinding
-import android.content.Context
-import android.content.Intent
-import android.widget.TextView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mycat.purrfectstore2.api.TokenManager
+import com.mycat.purrfectstore2.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -34,25 +35,25 @@ class HomeActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
+                // Top-level destinations. `addProductFragment` is removed.
                 R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
-                R.id.addProductFragment, R.id.modifyListFragment, R.id.deleteProductFragment,
-                R.id.myOrdersFragment, R.id.usersOrderListFragment, R.id.usersListFragment,
-                R.id.BannedUsersListFragment
+                R.id.myOrdersFragment, R.id.usersOrderListFragment,
+                R.id.usersListFragment, R.id.productsAdminFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         navView.setNavigationItemSelectedListener { menuItem ->
             binding.drawerLayout.closeDrawers()
-            when (menuItem.itemId) {
-                R.id.nav_logout -> {
-                    showLogoutConfirmationDialog()
-                    true
-                }
-                else -> {
-                    androidx.navigation.ui.NavigationUI.onNavDestinationSelected(menuItem, navController)
-                }
+
+            if (menuItem.itemId == R.id.nav_logout) {
+                showLogoutConfirmationDialog()
+                return@setNavigationItemSelectedListener true
             }
+            // Since the menu item IDs now match the destination IDs,
+            // this single line handles all navigation correctly.
+            val navigated = NavigationUI.onNavDestinationSelected(menuItem, navController)
+            return@setNavigationItemSelectedListener navigated
         }
         setupDrawerHeader()
     }

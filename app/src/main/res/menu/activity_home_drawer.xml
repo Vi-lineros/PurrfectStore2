@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?><menu xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
- <group
+
+    <group
         android:id="@+id/group_user_nav"
         android:checkableBehavior="single">
         <item
@@ -25,35 +27,18 @@
         android:id="@+id/group_admin"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/addProductFragment"
-            android:icon="@drawable/ic_menu_add"
-            android:title="Añadir Producto" />
-        <item
-            android:id="@+id/modifyListFragment"
-            android:icon="@drawable/ic_menu_edit"
-            android:title="Modificar Producto" />
-        <item
-            android:id="@+id/deleteProductFragment"
-            android:icon="@drawable/ic_menu_delete"
-            android:title="Eliminar Producto" />
+            android:id="@+id/productsAdminFragment"
+            android:icon="@drawable/ic_menu_products"
+            android:title="Productos Admin" />
         <item
             android:id="@+id/usersOrderListFragment"
             android:icon="@drawable/ic_menu_confirm_order"
-            android:title="Pedidos pendientes" />
+            android:title="Pedidos" />
+        <item
+            android:id="@+id/usersListFragment"
+            android:icon="@drawable/ic_menu_users"
+            android:title="Usuarios" />
     </group>
-    <group
-        android:id="@+id/group_admin_accounts"
-        android:checkableBehavior="single">
-    <item
-        android:id="@+id/usersListFragment"
-        android:icon="@drawable/ic_menu_users"
-        android:title="Usuarios registrados" />
-    <item
-        android:id="@+id/BannedUsersListFragment"
-        android:icon="@drawable/ic_menu_ban"
-        android:title="Usuarios bloqueados" />
-    </group>
-
     <group android:id="@+id/group_account">
         <item
             android:id="@+id/nav_logout"

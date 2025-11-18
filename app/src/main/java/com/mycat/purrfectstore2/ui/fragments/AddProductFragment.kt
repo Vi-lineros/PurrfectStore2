@@ -10,6 +10,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
@@ -27,7 +28,7 @@ import java.io.InputStream
 class AddProductFragment : Fragment() {
     private var _binding: FragmentAddProductBinding? = null
     private val binding get() = _binding!!
-    private val selectedImageUris = mutableListOf<Uri>()
+    private val imageItems = mutableListOf<Any>()
     private lateinit var imageAdapter: ImagePreviewAdapter
     private lateinit var uploadService: UploadService
     private lateinit var productService: ProductService
@@ -35,8 +36,8 @@ class AddProductFragment : Fragment() {
         ActivityResultContracts.PickMultipleVisualMedia()
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
-            val startPosition = selectedImageUris.size
-            selectedImageUris.addAll(uris)
+            val startPosition = imageItems.size
+            imageItems.addAll(uris)
             imageAdapter.notifyItemRangeInserted(startPosition, uris.size)
             if (binding.recyclerViewImagePreview.visibility == View.GONE) {
                 binding.recyclerViewImagePreview.visibility = View.VISIBLE
@@ -51,7 +52,10 @@ class AddProductFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         uploadService = RetrofitClient.createUploadService(requireContext())
         productService = RetrofitClient.createProductService(requireContext())
-        imageAdapter = ImagePreviewAdapter(selectedImageUris)
+        imageAdapter = ImagePreviewAdapter(imageItems) { position ->
+            imageItems.removeAt(position)
+            imageAdapter.notifyItemRemoved(position)
+        }
         binding.recyclerViewImagePreview.adapter = imageAdapter
         binding.recyclerViewImagePreview.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -73,7 +77,7 @@ class AddProductFragment : Fragment() {
             Toast.makeText(requireContext(), "Nombre, Precio y Stock son obligatorios", Toast.LENGTH_SHORT).show()
             return
         }
-        if (selectedImageUris.isEmpty()) {
+        if (imageItems.isEmpty()) {
             Toast.makeText(requireContext(), "Por favor, selecciona al menos una imagen", Toast.LENGTH_SHORT).show()
             return
         }
@@ -82,10 +86,12 @@ class AddProductFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val uploadedImageResponses = mutableListOf<ProductImage>()
-                for (uri in selectedImageUris) {
-                    val imageResponseList = uploadImage(uri)
-                    if (imageResponseList.isNotEmpty()) {
-                        uploadedImageResponses.add(imageResponseList.first())
+                for (item in imageItems) {
+                    if (item is Uri) {
+                        val imageResponseList = uploadImage(item)
+                        if (imageResponseList.isNotEmpty()) {
+                            uploadedImageResponses.add(imageResponseList.first())
+                        }
                     }
                 }
                 if (uploadedImageResponses.isEmpty()) {
@@ -101,6 +107,7 @@ class AddProductFragment : Fragment() {
                 val productResponse = productService.createProduct(createRequest)
                 val createdProductName = productResponse.name
                 Toast.makeText(requireContext(), "¡Producto '$createdProductName' creado con éxito!", Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
