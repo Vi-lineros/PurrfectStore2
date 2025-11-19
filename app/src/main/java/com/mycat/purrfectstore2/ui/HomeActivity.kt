@@ -15,7 +15,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
-import com.mycat.purrfectstore2.ProductsAdminFragment
+import com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment
 import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.ActivityHomeBinding

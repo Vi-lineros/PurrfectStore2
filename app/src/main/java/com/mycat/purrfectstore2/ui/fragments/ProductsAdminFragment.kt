@@ -1,7 +1,10 @@
-package com.mycat.purrfectstore2
+package com.mycat.purrfectstore2.ui.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -9,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.databinding.FragmentProductsAdminBinding
@@ -56,7 +60,10 @@ class ProductsAdminFragment : Fragment() {
                 if (productAdapter.isSelectionMode) {
                     productAdapter.toggleSelection(product.id)
                 } else {
-                    val action = ProductsAdminFragmentDirections.actionProductsAdminFragmentToEditProductFragment(product.id)
+                    val action =
+                        ProductsAdminFragmentDirections.actionProductsAdminFragmentToEditProductFragment(
+                            product.id
+                        )
                     findNavController().navigate(action)
                 }
             },
@@ -105,8 +112,7 @@ class ProductsAdminFragment : Fragment() {
     private fun showDeleteConfirmationDialog() {
         val selectedCount = productAdapter.selectedItems.size
         val productWord = if (selectedCount == 1) "producto" else "productos"
-        val los = if (selectedCount == 1) "el" else "los"
-        val message = "¿Confirmar eliminación de $los $selectedCount $productWord?"
+        val message = "¿Confirmar eliminación de  $selectedCount $productWord?"
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Confirmar eliminación")
@@ -119,12 +125,17 @@ class ProductsAdminFragment : Fragment() {
     }
 
     private fun deleteSelectedProducts() {
+        val selectedCount = productAdapter.selectedItems.size
+        val productWord = if (selectedCount == 1) "Producto" else "Productos"
+        val deleteWord = if (selectedCount == 1) "eliminado" else "eliminados"
+        val itemsToDelete = productAdapter.selectedItems.toList()
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                productAdapter.selectedItems.forEach { productId ->
+                itemsToDelete.forEach { productId ->
                     productService.deleteProduct(productId)
                 }
-                Toast.makeText(requireContext(), "Productos eliminados", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "$productWord $deleteWord con éxito!", Toast.LENGTH_SHORT).show()
                 exitSelectionMode()
                 loadProducts()
             } catch (e: Exception) {
@@ -134,7 +145,7 @@ class ProductsAdminFragment : Fragment() {
     }
 
     private fun setupSearch() {
-        binding.searchViewProducts.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+        binding.searchViewProducts.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filter(query)
                 binding.searchViewProducts.clearFocus()

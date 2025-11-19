@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/productsAdminFragment"
-        android:name="com.mycat.purrfectstore2.ProductsAdminFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment"
         android:label="Administración"
         tools:layout="@layout/fragment_products_admin" >
         <action
