@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProfileFragment"
-        android:label="fragment_nav__profile"
+        android:label="Mi Perfil"
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/productFragment"
@@ -36,7 +36,7 @@
     <fragment
         android:id="@+id/productsAdminFragment"
         android:name="com.mycat.purrfectstore2.ProductsAdminFragment"
-        android:label="fragment_products_admin"
+        android:label="Administración"
         tools:layout="@layout/fragment_products_admin" >
         <action
             android:id="@+id/action_productsAdminFragment_to_addProductFragment"

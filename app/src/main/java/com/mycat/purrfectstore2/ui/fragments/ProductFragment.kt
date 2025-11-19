@@ -40,10 +40,14 @@ class ProductFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        productAdapter = ProductAdapter { product ->
-            val action = ProductFragmentDirections.actionNavProductToNavProductDetails2(product.id)
-            findNavController().navigate(action)
-        }
+        productAdapter = ProductAdapter(
+            onProductClicked = { product ->
+                val action = ProductFragmentDirections.actionNavProductToNavProductDetails2(product.id)
+                findNavController().navigate(action)
+            },
+            onProductLongClicked = {},
+            onSelectionChanged = {}
+        )
         binding.recyclerViewProducts.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = productAdapter
