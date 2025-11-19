@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/productFragment"
-    tools:layout="@layout/fragment_product" >
+    app:startDestination="@id/productFragment">
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProfileFragment"
@@ -14,7 +13,7 @@
         android:id="@+id/productFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProductFragment"
         android:label="Productos"
-        tools:layout="@layout/fragment_product" >
+        tools:layout="@layout/fragment_product">
         <action
             android:id="@+id/action_nav_product_to_nav_Product_Details2"
             app:destination="@id/productDetailFragment" />
@@ -28,7 +27,7 @@
         android:id="@+id/productDetailFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProductDetailFragment"
         android:label="Detalles del Producto"
-        tools:layout="@layout/fragment_product_details" >
+        tools:layout="@layout/fragment_product_details">
         <argument
             android:name="productId"
             app:argType="integer" />
@@ -37,10 +36,10 @@
         android:id="@+id/productsAdminFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment"
         android:label="Administración"
-        tools:layout="@layout/fragment_products_admin" >
+        tools:layout="@layout/fragment_products_admin">
         <action
             android:id="@+id/action_productsAdminFragment_to_addProductFragment"
-            app:destination="@id/addProductFragment" />
+            app:destination="@+id/addProductFragment" />
         <action
             android:id="@+id/action_productsAdminFragment_to_editProductFragment"
             app:destination="@id/editProductFragment" />
@@ -49,9 +48,38 @@
         android:id="@+id/editProductFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.EditProductFragment"
         android:label="Modificar Producto"
-        tools:layout="@layout/fragment_edit_product" >
+        tools:layout="@layout/fragment_edit_product">
         <argument
             android:name="productId"
             app:argType="integer" />
     </fragment>
+
+    <!-- User Management Fragments -->
+    <fragment
+        android:id="@+id/usersListFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.UsersListFragment"
+        android:label="Usuarios"
+        tools:layout="@layout/fragment_users_list">
+        <action
+            android:id="@+id/action_usersListFragment_to_addUsersFragment"
+            app:destination="@id/addUsersFragment" />
+        <action
+            android:id="@+id/action_usersListFragment_to_editUsersFragment"
+            app:destination="@id/editUsersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addUsersFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.AddUsersFragment"
+        android:label="Añadir Usuario"
+        tools:layout="@layout/fragment_add_users" />
+    <fragment
+        android:id="@+id/editUsersFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.EditUsersFragment"
+        android:label="Editar Usuario"
+        tools:layout="@layout/fragment_edit_users">
+        <argument
+            android:name="userId"
+            app:argType="integer" />
+    </fragment>
+
 </navigation>

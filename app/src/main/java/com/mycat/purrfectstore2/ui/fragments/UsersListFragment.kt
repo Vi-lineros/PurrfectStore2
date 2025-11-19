@@ -1,0 +1,191 @@
+package com.mycat.purrfectstore2.ui.fragments
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.SearchView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mycat.purrfectstore2.R
+import com.mycat.purrfectstore2.api.RetrofitClient
+import com.mycat.purrfectstore2.api.UserService
+import com.mycat.purrfectstore2.databinding.FragmentUsersListBinding
+import com.mycat.purrfectstore2.model.User
+import com.mycat.purrfectstore2.ui.HomeActivity
+import com.mycat.purrfectstore2.ui.adapter.UserAdapter
+import kotlinx.coroutines.launch
+
+class UsersListFragment : Fragment() {
+
+    private var _binding: FragmentUsersListBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var userService: UserService
+    private lateinit var userAdapter: UserAdapter
+    private var allUsers: List<User> = emptyList()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentUsersListBinding.inflate(inflater, container, false)
+        userService = RetrofitClient.createUserService(requireContext())
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        setupSearch()
+        loadUsers()
+
+        binding.fabAddUser.setOnClickListener {
+            if (userAdapter.isSelectionMode) {
+                showDeleteConfirmationDialog()
+            } else {
+                findNavController().navigate(R.id.action_usersListFragment_to_addUsersFragment)
+            }
+        }
+    }
+
+    private fun setupRecyclerView() {
+        userAdapter = UserAdapter(
+            onUserClicked = { user ->
+                if (userAdapter.isSelectionMode) {
+                    userAdapter.toggleSelection(user.id)
+                } else {
+                    val action = UsersListFragmentDirections.actionUsersListFragmentToEditUsersFragment(user.id)
+                    findNavController().navigate(action)
+                }
+            },
+            onUserLongClicked = { user ->
+                if (!userAdapter.isSelectionMode) {
+                    enterSelectionMode(user.id)
+                }
+            },
+            onSelectionChanged = { count ->
+                if (userAdapter.isSelectionMode) {
+                    if (count == 0) {
+                        exitSelectionMode()
+                    } else {
+                        updateToolbarTitle(count)
+                    }
+                }
+            }
+        )
+
+        binding.recyclerViewUsers.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = userAdapter
+        }
+    }
+
+    private fun enterSelectionMode(userId: Int) {
+        userAdapter.isSelectionMode = true
+        userAdapter.toggleSelection(userId)
+        binding.fabAddUser.setImageResource(R.drawable.ic_delete)
+        updateToolbarTitle(1)
+        (activity as? HomeActivity)?.showCancelButton(true)
+    }
+
+    fun exitSelectionMode() {
+        userAdapter.clearSelection()
+        binding.fabAddUser.setImageResource(R.drawable.ic_add)
+        (activity as? AppCompatActivity)?.supportActionBar?.title = getString(R.string.title_users)
+        (activity as? HomeActivity)?.showCancelButton(false)
+    }
+
+    private fun updateToolbarTitle(count: Int) {
+        val userText = if (count == 1) "usuario" else "usuarios"
+        (activity as? AppCompatActivity)?.supportActionBar?.title = "$count $userText seleccionado(s)"
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        val selectedCount = userAdapter.selectedItems.size
+        val dialogUserWord = if (selectedCount == 1) "usuario" else "usuarios"
+        val message = "¿Confirmar eliminación de $selectedCount $dialogUserWord?"
+
+        val toastUserWord = if (selectedCount == 1) "Usuario" else "Usuarios"
+        val toastDeleteWord = if (selectedCount == 1) "eliminado" else "eliminados"
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmar eliminación")
+            .setMessage(message)
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Aceptar") { _, _ ->
+                deleteSelectedUsers(toastUserWord, toastDeleteWord)
+            }
+            .show()
+    }
+
+    private fun deleteSelectedUsers(userWord: String, deleteWord: String) {
+        val itemsToDelete = userAdapter.selectedItems.toList()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                itemsToDelete.forEach { userId ->
+                    userService.deleteUser(userId)
+                }
+                Toast.makeText(requireContext(), "$userWord $deleteWord con éxito!", Toast.LENGTH_SHORT).show()
+                exitSelectionMode()
+                loadUsers()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setupSearch() {
+        binding.searchViewUsers.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filter(query)
+                binding.searchViewUsers.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filter(newText)
+                return true
+            }
+        })
+    }
+
+    private fun filter(query: String?) {
+        val normalizedQuery = query?.trim()?.lowercase().orEmpty()
+        val filteredList = if (normalizedQuery.isBlank()) {
+            allUsers
+        } else {
+            allUsers.filter { user ->
+                user.email.lowercase().contains(normalizedQuery)
+            }
+        }
+        userAdapter.updateData(filteredList)
+    }
+
+    private fun loadUsers() {
+        binding.progressBar.visibility = View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val usersFromApi = userService.getUsers()
+                allUsers = usersFromApi
+                userAdapter.updateData(allUsers)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error cargando usuarios: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                binding.progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? HomeActivity)?.showCancelButton(false)
+        _binding = null
+    }
+}

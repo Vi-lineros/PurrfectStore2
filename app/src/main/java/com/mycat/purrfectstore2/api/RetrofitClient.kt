@@ -26,15 +26,25 @@ object RetrofitClient {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-    fun createAuthService(context: Context, requiresAuth: Boolean = false): AuthService {
-        var clientBuilder = baseOkHttpBuilder()
+
+    // The token can now be passed directly, to be used immediately after login,
+    // bypassing the need to read it from SharedPreferences.
+    fun createAuthService(context: Context, requiresAuth: Boolean = false, token: String? = null): AuthService {
+        val clientBuilder = baseOkHttpBuilder()
         if (requiresAuth) {
-            val tokenManager = TokenManager(context)
-            clientBuilder.addInterceptor(AuthInterceptor{tokenManager.getToken()})
+            // Rewriting the logic to be more explicit and avoid the type mismatch error.
+            val tokenProvider: () -> String?
+            if (token != null) {
+                tokenProvider = { token } // Use the token passed as an argument
+            } else {
+                tokenProvider = { TokenManager(context).getToken() } // Fallback to getting token from storage
+            }
+            clientBuilder.addInterceptor(AuthInterceptor(tokenProvider))
         }
         val client = clientBuilder.build()
         return retrofit(authBaseUrl, client).create(AuthService::class.java)
-        }
+    }
+
     fun createProductService(context: Context): ProductService {
         val tokenManager = TokenManager(context)
         val client = baseOkHttpBuilder()
@@ -42,6 +52,15 @@ object RetrofitClient {
             .build()
         return retrofit(storeBaseUrl, client).create(ProductService::class.java)
     }
+
+    fun createUserService(context: Context): UserService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor{tokenManager.getToken()})
+            .build()
+        return retrofit(storeBaseUrl, client).create(UserService::class.java)
+    }
+
     fun createUploadService(context: Context): UploadService {
         val tokenManager = TokenManager(context)
         val client = baseOkHttpBuilder()

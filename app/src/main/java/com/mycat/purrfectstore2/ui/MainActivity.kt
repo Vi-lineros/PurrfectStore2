@@ -48,20 +48,24 @@ class MainActivity : AppCompatActivity() {
                         publicAuthService.login(LoginRequest(email = email, password = password))
                     }
                     val authToken = loginResponse.authToken
-                    tokenManager.saveAuth(token = authToken, userName = "", userEmail = "")
-                    val privateAuthClient = RetrofitClient.createAuthService(this@MainActivity, true)
+
+                    // Use the token immediately for the next call, without relying on storage.
+                    val privateAuthClient = RetrofitClient.createAuthService(this@MainActivity, true, token = authToken)
                     val userProfile = withContext(Dispatchers.IO) {
                         privateAuthClient.getMe()
                     }
-                    tokenManager.saveAuth(
+
+                    // Now that all calls have succeeded, save everything to storage.
+                    tokenManager.saveAuthWithRole(
                         token = authToken,
-                        userName = userProfile.name,
-                        userEmail = userProfile.email
+                        userName = userProfile.username,
+                        userEmail = userProfile.email,
+                        userRole = userProfile.role
                     )
-                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.name}!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.username}!", Toast.LENGTH_SHORT).show()
                     goToHome()
                 } catch (e: Exception) {
-                    Log.e("MainActivity_Login", "Error en el proceso de login: ${e.message}", e)
+                    Log.e("MainActivity_Login", "Error during login process. See exception details below:", e)
                     Toast.makeText(this@MainActivity, "Email o Contraseña incorrectos", Toast.LENGTH_LONG).show()
                     tokenManager.clear()
                 } finally {
