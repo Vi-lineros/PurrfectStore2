@@ -45,10 +45,21 @@ class RegisterActivity : AppCompatActivity() {
             try {
                 val authService = RetrofitClient.createAuthService(this@RegisterActivity)
                 val signupBody = SignupBody(name, email, password)
-                val response = authService.signUp(signupBody)
+                val signupResponse = authService.signUp(signupBody)
+                val authToken = signupResponse.authToken
 
-                // Use the new function and assign a default role of "cliente"
-                TokenManager(this@RegisterActivity).saveAuthWithRole(response.authToken, name, email, "cliente")
+                // Immediately use the new token to fetch the complete user profile
+                val privateAuthClient = RetrofitClient.createAuthService(this@RegisterActivity, true, token = authToken)
+                val userProfile = privateAuthClient.getMe()
+
+                // Now, save all data including the user ID
+                TokenManager(this@RegisterActivity).saveAuthWithRole(
+                    token = authToken,
+                    userId = userProfile.id,
+                    userName = userProfile.username,
+                    userEmail = userProfile.email,
+                    userRole = "cliente" // Assigning the default role
+                )
 
                 Toast.makeText(this@RegisterActivity, "¡Registro exitoso!", Toast.LENGTH_LONG).show()
                 val intent = Intent(this@RegisterActivity, HomeActivity::class.java)

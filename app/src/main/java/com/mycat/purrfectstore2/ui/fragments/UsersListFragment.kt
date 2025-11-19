@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.RetrofitClient
+import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.api.UserService
 import com.mycat.purrfectstore2.databinding.FragmentUsersListBinding
 import com.mycat.purrfectstore2.model.User
@@ -27,7 +28,9 @@ class UsersListFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var userService: UserService
     private lateinit var userAdapter: UserAdapter
+    private lateinit var tokenManager: TokenManager
     private var allUsers: List<User> = emptyList()
+    private var adminId: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +38,8 @@ class UsersListFragment : Fragment() {
     ): View {
         _binding = FragmentUsersListBinding.inflate(inflater, container, false)
         userService = RetrofitClient.createUserService(requireContext())
+        tokenManager = TokenManager(requireContext())
+        adminId = tokenManager.getUserId()
         return binding.root
     }
 
@@ -58,7 +63,11 @@ class UsersListFragment : Fragment() {
         userAdapter = UserAdapter(
             onUserClicked = { user ->
                 if (userAdapter.isSelectionMode) {
-                    userAdapter.toggleSelection(user.id)
+                    if (user.id == adminId) {
+                        Toast.makeText(requireContext(), "No puedes seleccionarte a ti mismo", Toast.LENGTH_SHORT).show()
+                    } else {
+                        userAdapter.toggleSelection(user.id)
+                    }
                 } else {
                     val action = UsersListFragmentDirections.actionUsersListFragmentToEditUsersFragment(user.id)
                     findNavController().navigate(action)
@@ -66,7 +75,11 @@ class UsersListFragment : Fragment() {
             },
             onUserLongClicked = { user ->
                 if (!userAdapter.isSelectionMode) {
-                    enterSelectionMode(user.id)
+                     if (user.id == adminId) {
+                        Toast.makeText(requireContext(), "No puedes seleccionarte a ti mismo", Toast.LENGTH_SHORT).show()
+                    } else {
+                        enterSelectionMode(user.id)
+                    }
                 }
             },
             onSelectionChanged = { count ->
@@ -77,12 +90,59 @@ class UsersListFragment : Fragment() {
                         updateToolbarTitle(count)
                     }
                 }
+            },
+            onStatusClicked = { user ->
+                 if (user.id == adminId) {
+                    Toast.makeText(requireContext(), "No puedes cambiar tu propio estado", Toast.LENGTH_SHORT).show()
+                } else {
+                    showBanUnbanDialog(user)
+                }
             }
         )
 
         binding.recyclerViewUsers.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = userAdapter
+        }
+    }
+
+    private fun showBanUnbanDialog(user: User) {
+        val isBanned = user.status?.lowercase() == "banned"
+        val title = if (isBanned) "¿Desbanear usuario?" else "¿Banear usuario?"
+        val message = "¿Confirmas que quieres cambiar el estado de ${user.username}?"
+        val actionButton = "Aceptar"
+        val newStatus = if (isBanned) "normal" else "banned"
+        val successMessage = if (isBanned) "Usuario desbaneado" else "Usuario baneado"
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton(actionButton) { _, _ ->
+                updateUserStatus(user, newStatus, successMessage)
+            }
+            .show()
+    }
+
+    private fun updateUserStatus(user: User, newStatus: String, successMessage: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val fullUserData = mutableMapOf<String, @JvmSuppressWildcards Any>()
+                fullUserData["name"] = user.username
+                fullUserData["email"] = user.email
+                fullUserData["role"] = user.role
+                user.firstName?.let { fullUserData["first_name"] = it }
+                user.lastName?.let { fullUserData["last_name"] = it }
+                user.shippingAddress?.let { fullUserData["shipping_address"] = it }
+                user.phoneNumber?.let { fullUserData["phone"] = it }
+                fullUserData["status"] = newStatus
+                
+                userService.updateUser(user.id, fullUserData)
+                Toast.makeText(requireContext(), "$successMessage con éxito", Toast.LENGTH_SHORT).show()
+                loadUsers()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error al actualizar estado: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -111,21 +171,20 @@ class UsersListFragment : Fragment() {
         val dialogUserWord = if (selectedCount == 1) "usuario" else "usuarios"
         val message = "¿Confirmar eliminación de $selectedCount $dialogUserWord?"
 
-        val toastUserWord = if (selectedCount == 1) "Usuario" else "Usuarios"
-        val toastDeleteWord = if (selectedCount == 1) "eliminado" else "eliminados"
-
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Confirmar eliminación")
             .setMessage(message)
             .setNegativeButton("Cancelar", null)
             .setPositiveButton("Aceptar") { _, _ ->
-                deleteSelectedUsers(toastUserWord, toastDeleteWord)
+                deleteSelectedUsers()
             }
             .show()
     }
 
-    private fun deleteSelectedUsers(userWord: String, deleteWord: String) {
+    private fun deleteSelectedUsers() {
         val itemsToDelete = userAdapter.selectedItems.toList()
+        val userWord = if (itemsToDelete.size == 1) "Usuario" else "Usuarios"
+        val deleteWord = if (itemsToDelete.size == 1) "eliminado" else "eliminados"
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -162,7 +221,8 @@ class UsersListFragment : Fragment() {
             allUsers
         } else {
             allUsers.filter { user ->
-                user.email.lowercase().contains(normalizedQuery)
+                user.email.lowercase().contains(normalizedQuery) ||
+                user.username.lowercase().contains(normalizedQuery)
             }
         }
         userAdapter.updateData(filteredList)

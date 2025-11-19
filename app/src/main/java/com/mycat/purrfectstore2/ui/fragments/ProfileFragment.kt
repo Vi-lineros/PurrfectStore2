@@ -5,32 +5,75 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mycat.purrfectstore2.R
+import com.mycat.purrfectstore2.api.AuthService
+import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentProfileBinding
+import com.mycat.purrfectstore2.model.User
 import com.mycat.purrfectstore2.ui.MainActivity
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var authService: AuthService
+    private lateinit var tokenManager: TokenManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        tokenManager = TokenManager(requireContext())
+        authService = RetrofitClient.createAuthService(requireContext(), true, tokenManager.getToken())
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUserData()
+        loadUserProfile()
+        setupEditButton()
         setupLogoutButton()
     }
 
-    private fun setupUserData() {
-        val tokenManager = TokenManager(requireContext())
-        binding.textViewProfileName.text = tokenManager.getUserName()
-        binding.textViewProfileEmail.text = tokenManager.getUserEmail()
+    private fun loadUserProfile() {
+        lifecycleScope.launch {
+            try {
+                val userProfile = authService.getMe()
+                populateUI(userProfile)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error al cargar el perfil: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun populateUI(user: User) {
+        binding.textViewProfileNameTitle.text = user.username
+        binding.textInputEmail.setText(user.email)
+        binding.textInputFirstName.setText(user.firstName ?: "")
+        binding.textInputLastName.setText(user.lastName ?: "")
+        binding.textInputAddress.setText(user.shippingAddress ?: "")
+        binding.textInputPhone.setText(user.phoneNumber ?: "")
+
+        Glide.with(this)
+            .load(user.photoUrl)
+            .placeholder(R.drawable.fresa)
+            .error(R.drawable.fresa)
+            .into(binding.imageViewProfile)
+    }
+
+    private fun setupEditButton() {
+        binding.fabEditProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
     }
 
     private fun setupLogoutButton() {
@@ -38,6 +81,7 @@ class ProfileFragment : Fragment() {
             showLogoutConfirmationDialog()
         }
     }
+
     private fun showLogoutConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Confirmar Cierre de Sesión")
@@ -48,6 +92,7 @@ class ProfileFragment : Fragment() {
             }
             .show()
     }
+
     private fun performLogout() {
         val activityContext = requireActivity()
         val tokenManager = TokenManager(activityContext)
@@ -58,6 +103,7 @@ class ProfileFragment : Fragment() {
         startActivity(intent)
         activityContext.finish()
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

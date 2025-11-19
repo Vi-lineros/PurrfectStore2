@@ -19,6 +19,7 @@ import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.ActivityHomeBinding
 import com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment
+import com.mycat.purrfectstore2.ui.fragments.UsersListFragment
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -63,12 +64,14 @@ class HomeActivity : AppCompatActivity() {
         }
 
         setupDrawerHeader()
-        setupRoleBasedMenu() // <-- Logic to hide admin menu is called here
+        setupRoleBasedMenu()
 
+        // This listener will now handle both fragment types
         cancelButton.setOnClickListener {
             val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-            if (currentFragment is ProductsAdminFragment) {
-                currentFragment.exitSelectionMode()
+            when (currentFragment) {
+                is ProductsAdminFragment -> currentFragment.exitSelectionMode()
+                is UsersListFragment -> currentFragment.exitSelectionMode()
             }
         }
     }
@@ -112,7 +115,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun performLogout() {
-        tokenManager.clear() // Use TokenManager to clear session
+        tokenManager.clear()
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

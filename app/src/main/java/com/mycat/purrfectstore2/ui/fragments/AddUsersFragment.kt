@@ -14,6 +14,8 @@ import com.mycat.purrfectstore2.api.UserCreationRequest
 import com.mycat.purrfectstore2.api.UserService
 import com.mycat.purrfectstore2.databinding.FragmentAddUsersBinding
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
 
 class AddUsersFragment : Fragment() {
 
@@ -73,7 +75,27 @@ class AddUsersFragment : Fragment() {
                 Toast.makeText(requireContext(), "Usuario '${newUser.username}' creado con éxito", Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error al crear usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+                // --- Start of Enhanced Error Handling (copied from EditUsersFragment) ---
+                var errorMessage = "Error al crear usuario"
+                if (e is HttpException && e.code() == 400) {
+                    try {
+                        val errorBody = e.response()?.errorBody()?.string() ?: "{}"
+                        val json = JSONObject(errorBody)
+                        val serverMessage = json.optString("message", "").lowercase()
+
+                        if (serverMessage.contains("password") || serverMessage.contains("contraseña") || serverMessage.contains("weak") || serverMessage.contains("debil")) {
+                            errorMessage = "Contraseña muy débil"
+                        } else {
+                            errorMessage = json.optString("message", errorMessage)
+                        }
+                    } catch (jsonE: Exception) {
+                        errorMessage = "Error en los datos enviados (400)"
+                    }
+                } else {
+                     errorMessage = e.message ?: errorMessage
+                }
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                 // --- End of Enhanced Error Handling ---
             }
         }
     }

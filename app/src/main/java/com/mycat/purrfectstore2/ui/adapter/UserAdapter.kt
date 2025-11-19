@@ -3,7 +3,6 @@ package com.mycat.purrfectstore2.ui.adapter
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mycat.purrfectstore2.R
@@ -13,20 +12,13 @@ import com.mycat.purrfectstore2.model.User
 class UserAdapter(
     private val onUserClicked: (User) -> Unit,
     private val onUserLongClicked: (User) -> Unit,
-    private val onSelectionChanged: (Int) -> Unit
+    private val onSelectionChanged: (Int) -> Unit,
+    private val onStatusClicked: (User) -> Unit // New communication channel for status clicks
 ) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     private var users: List<User> = emptyList()
-    var isSelectionMode = false
-        set(value) {
-            field = value
-            if (!value) {
-                selectedItems.clear()
-            }
-            notifyDataSetChanged()
-            onSelectionChanged(selectedItems.size)
-        }
     val selectedItems = mutableSetOf<Int>()
+    var isSelectionMode = false
 
     fun updateData(newUsers: List<User>) {
         users = newUsers
@@ -39,12 +31,14 @@ class UserAdapter(
         } else {
             selectedItems.add(userId)
         }
-        notifyDataSetChanged()
         onSelectionChanged(selectedItems.size)
+        notifyDataSetChanged()
     }
 
     fun clearSelection() {
+        selectedItems.clear()
         isSelectionMode = false
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -66,30 +60,34 @@ class UserAdapter(
 
             Glide.with(itemView.context)
                 .load(user.photoUrl)
-                .placeholder(R.drawable.ic_menu_profile) // Placeholder image
+                .placeholder(R.drawable.ic_menu_profile)
                 .into(binding.userImage)
 
-            // Handle user status safely
+            // Update status text and appearance
             when (user.status?.lowercase()) {
-                "active" -> {
+                "active", "normal" -> {
                     binding.userStatus.text = "Activo"
                     binding.userStatus.setBackgroundResource(R.drawable.bg_status_active)
                 }
                 "banned" -> {
-                    binding.userStatus.text = "Baneado"
+                    binding.userStatus.text = "Ban"
                     binding.userStatus.setBackgroundResource(R.drawable.bg_status_banned)
                 }
                 else -> {
                     binding.userStatus.text = user.status ?: "Desconocido"
-                    binding.userStatus.setBackgroundColor(Color.GRAY) // Default case
+                    binding.userStatus.setBackgroundColor(Color.GRAY)
                 }
             }
 
-            // Handle selection UI
+            // Set the new listener on the status view
+            binding.userStatus.setOnClickListener {
+                onStatusClicked(user)
+            }
+
+            // Visual feedback for selection
             val isSelected = selectedItems.contains(user.id)
-            binding.root.isActivated = isSelected
             if (isSelected) {
-                binding.root.setCardBackgroundColor(ContextCompat.getColor(itemView.context, R.color.selected_item_color))
+                binding.root.setCardBackgroundColor(Color.argb(40, 255, 0, 0))
             } else {
                 binding.root.setCardBackgroundColor(Color.WHITE)
             }

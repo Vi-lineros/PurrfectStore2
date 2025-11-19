@@ -8,7 +8,11 @@
         android:id="@+id/profileFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProfileFragment"
         android:label="Mi Perfil"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/productFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProductFragment"
@@ -81,5 +85,10 @@
             android:name="userId"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.EditProfileFragment"
+        android:label="Editar Perfil"
+        tools:layout="@layout/fragment_edit_profile" />
 
 </navigation>

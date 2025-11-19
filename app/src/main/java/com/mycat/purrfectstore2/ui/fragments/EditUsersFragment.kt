@@ -1,6 +1,7 @@
 package com.mycat.purrfectstore2.ui.fragments
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,8 @@ import com.mycat.purrfectstore2.api.UserService
 import com.mycat.purrfectstore2.databinding.FragmentEditUsersBinding
 import com.mycat.purrfectstore2.model.User
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import retrofit2.HttpException
 
 class EditUsersFragment : Fragment() {
 
@@ -68,54 +71,77 @@ class EditUsersFragment : Fragment() {
             binding.radiogroupRole.check(R.id.radio_role_client)
         }
         
-        binding.textInputPassword.editText?.hint = "Dejar en blanco para no cambiar"
+        // Removed hint to fix overlapping text issue.
     }
 
     private fun saveChanges() {
-        val userToUpdate = currentUser ?: return
+        // --- Start of Strict Validation ---
+        val fields = mapOf(
+            "El nombre de usuario" to binding.textInputUsername.editText?.text.toString().trim(),
+            "El email" to binding.textInputEmail.editText?.text.toString().trim(),
+            "La contraseña" to binding.textInputPassword.editText?.text.toString().trim(),
+            "El nombre" to binding.textInputFirstName.editText?.text.toString().trim(),
+            "El apellido" to binding.textInputLastName.editText?.text.toString().trim(),
+            "La dirección" to binding.textInputAddress.editText?.text.toString().trim(),
+            "El teléfono" to binding.textInputPhone.editText?.text.toString().trim()
+        )
 
-        val updatedFields = mutableMapOf<String, @JvmSuppressWildcards Any>()
-
-        val username = binding.textInputUsername.editText?.text.toString().trim()
-        if (username != userToUpdate.username) updatedFields["name"] = username
-
-        val email = binding.textInputEmail.editText?.text.toString().trim()
-        if (email != userToUpdate.email) updatedFields["email"] = email
-
-        val firstName = binding.textInputFirstName.editText?.text.toString().trim()
-        if (firstName != userToUpdate.firstName) updatedFields["first_name"] = firstName
-
-        val lastName = binding.textInputLastName.editText?.text.toString().trim()
-        if (lastName != userToUpdate.lastName) updatedFields["last_name"] = lastName
-
-        val address = binding.textInputAddress.editText?.text.toString().trim()
-        if (address != userToUpdate.shippingAddress) updatedFields["shipping_address"] = address
-
-        val phone = binding.textInputPhone.editText?.text.toString().trim()
-        if (phone != userToUpdate.phoneNumber) updatedFields["phone"] = phone
-
-        val selectedRoleId = binding.radiogroupRole.checkedRadioButtonId
-        val role = if (selectedRoleId == R.id.radio_role_admin) "admin" else "cliente"
-        if (role != userToUpdate.role) updatedFields["role"] = role
-
-        // As per your request, re-enabling password changes from the admin panel.
-        val password = binding.textInputPassword.editText?.text.toString().trim()
-        if (password.isNotEmpty()) {
-            updatedFields["password"] = password
+        for ((fieldName, value) in fields) {
+            if (value.isEmpty()) {
+                Toast.makeText(requireContext(), "$fieldName no puede estar vacío", Toast.LENGTH_SHORT).show()
+                return
+            }
         }
 
-        if (updatedFields.isEmpty()) {
-            Toast.makeText(requireContext(), "No se han realizado cambios", Toast.LENGTH_SHORT).show()
+        val email = fields["El email"]!!
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(requireContext(), "Por favor, introduce un email válido", Toast.LENGTH_SHORT).show()
             return
         }
+        // --- End of Strict Validation ---
 
+        // --- Build the full data map ---
+        val fullUserData = mutableMapOf<String, @JvmSuppressWildcards Any>()
+        fullUserData["name"] = fields["El nombre de usuario"]!!
+        fullUserData["email"] = email
+        fullUserData["password"] = fields["La contraseña"]!!
+        fullUserData["first_name"] = fields["El nombre"]!!
+        fullUserData["last_name"] = fields["El apellido"]!!
+        fullUserData["shipping_address"] = fields["La dirección"]!!
+        fullUserData["phone"] = fields["El teléfono"]!!
+
+        val selectedRoleId = binding.radiogroupRole.checkedRadioButtonId
+        fullUserData["role"] = if (selectedRoleId == R.id.radio_role_admin) "admin" else "cliente"
+
+        // --- Send the full object ---
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val updatedUser = userService.updateUser(userToUpdate.id, updatedFields)
+                val updatedUser = userService.updateUser(currentUser!!.id, fullUserData)
                 Toast.makeText(requireContext(), "Usuario '${updatedUser.username}' actualizado con éxito", Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error al actualizar el usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+                // --- Start of Enhanced Error Handling ---
+                var errorMessage = "Error al actualizar el usuario"
+                if (e is HttpException && e.code() == 400) {
+                    try {
+                        val errorBody = e.response()?.errorBody()?.string() ?: "{}"
+                        val json = JSONObject(errorBody)
+                        val serverMessage = json.optString("message", "").lowercase()
+
+                        if (serverMessage.contains("password") || serverMessage.contains("contraseña") || serverMessage.contains("weak") || serverMessage.contains("debil")) {
+                            errorMessage = "Contraseña muy débil"
+                        } else {
+                            errorMessage = json.optString("message", errorMessage)
+                        }
+                    } catch (jsonE: Exception) {
+                        // Could not parse, use a generic 400 error message
+                        errorMessage = "Error en los datos enviados (400)"
+                    }
+                } else {
+                     errorMessage = e.message ?: errorMessage
+                }
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                 // --- End of Enhanced Error Handling ---
             }
         }
     }
