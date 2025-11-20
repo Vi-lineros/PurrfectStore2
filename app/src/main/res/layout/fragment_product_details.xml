@@ -155,7 +155,7 @@
                         android:layout_height="40dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_remove"
-                        app:tint="?attr/colorOnPrimary"/>
+                        app:tint="@android:color/black"/>
 
                     <TextView
                         android:textColor="?attr/colorOnPrimary"
@@ -174,7 +174,7 @@
                         android:layout_height="40dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_add"
-                        app:tint="?attr/colorOnPrimary" />
+                        app:tint="@android:color/black" />
                 </LinearLayout>
 
                 <Button

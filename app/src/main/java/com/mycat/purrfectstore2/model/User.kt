@@ -2,8 +2,6 @@ package com.mycat.purrfectstore2.model
 
 import com.google.gson.annotations.SerializedName
 
-// This class now accurately reflects the data from BOTH the auth/me endpoint
-// and the more detailed user endpoints by making non-essential fields nullable.
 data class User(
     @SerializedName("id")
     val id: Int,
@@ -20,7 +18,6 @@ data class User(
     @SerializedName("role")
     var role: String,
 
-    // These fields may not come from the /auth/me endpoint, so they must be nullable.
     @SerializedName("first_name")
     var firstName: String? = null,
 
@@ -37,5 +34,9 @@ data class User(
     var photoUrl: String? = null,
 
     @SerializedName("status")
-    var status: String? = null
+    var status: String? = null,
+
+    // The 'cart' field is now a list of carts, as configured in Xano.
+    @SerializedName("cart")
+    val cart: List<Cart>? 
 )

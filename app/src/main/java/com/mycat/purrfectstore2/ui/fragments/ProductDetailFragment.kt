@@ -1,17 +1,23 @@
 package com.mycat.purrfectstore2.ui.fragments
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
+import com.mycat.purrfectstore2.api.CartService
 import com.mycat.purrfectstore2.api.RetrofitClient
+import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentProductDetailsBinding
+import com.mycat.purrfectstore2.model.CartProduct
 import com.mycat.purrfectstore2.model.Product
+import com.mycat.purrfectstore2.model.UpdateCartProductsRequest
 import com.mycat.purrfectstore2.ui.adapter.ImageSliderAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,14 +27,20 @@ class ProductDetailFragment : Fragment() {
     private val args: ProductDetailFragmentArgs by navArgs()
     private var _binding: FragmentProductDetailsBinding? = null
     private val binding get() = _binding!!
+    private lateinit var cartService: CartService
+    private lateinit var tokenManager: TokenManager
     private var currentProduct: Product? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductDetailsBinding.inflate(inflater, container, false)
+        cartService = RetrofitClient.createCartService(requireContext())
+        tokenManager = TokenManager(requireContext())
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val productId = args.productId
@@ -38,29 +50,70 @@ class ProductDetailFragment : Fragment() {
             Toast.makeText(context, "Error: ID de producto no válido.", Toast.LENGTH_LONG).show()
         }
     }
+
     private fun loadProductDetails(productId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val product = withContext(Dispatchers.IO) {
-                    val service = RetrofitClient.createProductService(requireContext())
-                    service.getProductId(productId)
+                    RetrofitClient.createProductService(requireContext()).getProductId(productId)
                 }
                 currentProduct = product
                 updateUI(product)
-
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al cargar el producto: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
+
     private fun updateUI(product: Product) {
         binding.textViewDetailProductName.text = product.name
         binding.textViewDetailProductDescription.text = product.description
         binding.textViewDetailProductStock.text = "Stock: ${product.stock}"
         setupImageCarousel(product)
         setupQuantityButtons(product.stock)
-        setupAddToCartButton()
+        setupAddToCartButton(product.id)
     }
+    
+    private fun setupAddToCartButton(productId: Int) {
+        binding.buttonAddToCart.setOnClickListener { 
+            binding.buttonAddToCart.isEnabled = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val cartId = tokenManager.getCartId()
+                    val stock = currentProduct?.stock ?: 0
+                    if (cartId == -1) throw IllegalStateException("Sesión o carrito no válidos.")
+
+                    val currentCart = cartService.getCart(cartId)
+                    val updatedProductList = currentCart.product_id?.toMutableList() ?: mutableListOf()
+                    val quantityToAdd = binding.textViewQuantity.text.toString().toInt()
+
+                    val existingProduct = updatedProductList.find { it.product_id == productId }
+                    val currentQuantityInCart = existingProduct?.quantity ?: 0
+
+                    if (currentQuantityInCart + quantityToAdd > stock) {
+                        Toast.makeText(requireContext(), "No hay suficiente stock", Toast.LENGTH_SHORT).show()
+                    } else {
+                        if (existingProduct != null) {
+                            existingProduct.quantity += quantityToAdd
+                        } else {
+                            updatedProductList.add(CartProduct(product_id = productId, quantity = quantityToAdd))
+                        }
+
+                        val updateRequest = UpdateCartProductsRequest(products = updatedProductList)
+                        cartService.updateCart(cartId, updateRequest)
+
+                        Toast.makeText(requireContext(), "Producto añadido/actualizado en el carrito", Toast.LENGTH_SHORT).show()
+                    }
+
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Error al actualizar el carrito: ${e.message}", Toast.LENGTH_LONG).show()
+                } finally {
+                    binding.buttonAddToCart.isEnabled = true
+                }
+            }
+        }
+    }
+
     private fun setupImageCarousel(product: Product) {
         val imageList = product.images
         if (imageList.isNotEmpty()) {
@@ -72,6 +125,7 @@ class ProductDetailFragment : Fragment() {
             binding.cardViewImages.visibility = View.GONE
         }
     }
+
     private fun setupCarouselButtons(imageCount: Int) {
         val viewPager = binding.viewPagerProductImages
         val prevButton = binding.buttonPreviousImage
@@ -93,13 +147,21 @@ class ProductDetailFragment : Fragment() {
         prevButton.visibility = View.INVISIBLE
         nextButton.visibility = View.VISIBLE
     }
+
     private fun setupQuantityButtons(maxStock: Int) {
         var quantity = 1
         binding.textViewQuantity.text = quantity.toString()
+
+        val blackColor = ContextCompat.getColor(requireContext(), android.R.color.black)
+        binding.buttonDecrease.setColorFilter(blackColor, PorterDuff.Mode.SRC_ATOP)
+        binding.buttonIncrease.setColorFilter(blackColor, PorterDuff.Mode.SRC_ATOP)
+
         binding.buttonIncrease.setOnClickListener {
             if (quantity < maxStock) {
                 quantity++
                 binding.textViewQuantity.text = quantity.toString()
+            } else {
+                Toast.makeText(requireContext(), "No hay más stock disponible", Toast.LENGTH_SHORT).show()
             }
         }
         binding.buttonDecrease.setOnClickListener {
@@ -109,14 +171,7 @@ class ProductDetailFragment : Fragment() {
             }
         }
     }
-    private fun setupAddToCartButton() {
-        binding.buttonAddToCart.setOnClickListener {
-            val quantity = binding.textViewQuantity.text.toString().toIntOrNull() ?: 1
-            if (currentProduct != null) {
-                Toast.makeText(requireContext(), "$quantity ${currentProduct!!.name}(s) añadido(s)", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

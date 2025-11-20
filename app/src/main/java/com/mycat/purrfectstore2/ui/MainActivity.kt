@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     val publicAuthService = RetrofitClient.createAuthService(this@MainActivity)
+
                     val loginResponse = withContext(Dispatchers.IO) {
                         publicAuthService.login(LoginRequest(email = email, password = password))
                     }
@@ -64,14 +65,23 @@ class MainActivity : AppCompatActivity() {
                     if (userProfile.status?.lowercase() == "banned") {
                         Toast.makeText(this@MainActivity, "Usuario baneado", Toast.LENGTH_LONG).show()
                     } else {
-                        // Save all user data, including the ID
+                        // Save all user and session data
                         tokenManager.saveAuthWithRole(
                             token = authToken,
-                            userId = userProfile.id, // Pass the user ID
+                            userId = userProfile.id,
                             userName = userProfile.username,
                             userEmail = userProfile.email,
                             userRole = userProfile.role
                         )
+
+                        // CRUCIAL: Find the active cart from the list and save its ID
+                        val activeCart = userProfile.cart?.find { it.status == "en proceso" }
+                        activeCart?.id?.let {
+                            tokenManager.saveCartId(it)
+                        } ?: run {
+                            Log.w("MainActivity_Login", "User ${userProfile.id} has no active cart in the list.")
+                        }
+
                         Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.username}!", Toast.LENGTH_SHORT).show()
                         goToHome()
                     }

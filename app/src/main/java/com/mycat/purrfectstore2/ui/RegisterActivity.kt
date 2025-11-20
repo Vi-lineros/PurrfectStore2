@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.ActivityRegisterBinding
+import com.mycat.purrfectstore2.model.CreateCartRequest
 import com.mycat.purrfectstore2.model.SignupBody
 import kotlinx.coroutines.launch
 
@@ -44,24 +45,30 @@ class RegisterActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val authService = RetrofitClient.createAuthService(this@RegisterActivity)
+                val cartService = RetrofitClient.createCartService(this@RegisterActivity)
+                val tokenManager = TokenManager(this@RegisterActivity)
+
                 val signupBody = SignupBody(name, email, password)
                 val signupResponse = authService.signUp(signupBody)
                 val authToken = signupResponse.authToken
 
-                // Immediately use the new token to fetch the complete user profile
                 val privateAuthClient = RetrofitClient.createAuthService(this@RegisterActivity, true, token = authToken)
                 val userProfile = privateAuthClient.getMe()
 
-                // Now, save all data including the user ID
-                TokenManager(this@RegisterActivity).saveAuthWithRole(
+                tokenManager.saveAuthWithRole(
                     token = authToken,
                     userId = userProfile.id,
                     userName = userProfile.username,
                     userEmail = userProfile.email,
-                    userRole = "cliente" // Assigning the default role
+                    userRole = "cliente"
                 )
 
-                Toast.makeText(this@RegisterActivity, "¡Registro exitoso!", Toast.LENGTH_LONG).show()
+                // Create a cart for the new user
+                val createCartRequest = CreateCartRequest(user_id = userProfile.id)
+                val newCart = cartService.createCart(createCartRequest)
+                tokenManager.saveCartId(newCart.id)
+
+                Toast.makeText(this@RegisterActivity, "¡Registro exitoso! Carrito creado.", Toast.LENGTH_LONG).show()
                 val intent = Intent(this@RegisterActivity, HomeActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)

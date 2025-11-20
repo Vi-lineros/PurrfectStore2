@@ -9,10 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.mycat.purrfectstore2.R
+import com.mycat.purrfectstore2.api.CartService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.UserCreationRequest
 import com.mycat.purrfectstore2.api.UserService
 import com.mycat.purrfectstore2.databinding.FragmentAddUsersBinding
+import com.mycat.purrfectstore2.model.CreateCartRequest
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -22,6 +24,7 @@ class AddUsersFragment : Fragment() {
     private var _binding: FragmentAddUsersBinding? = null
     private val binding get() = _binding!!
     private lateinit var userService: UserService
+    private lateinit var cartService: CartService // Service to create the cart
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +32,7 @@ class AddUsersFragment : Fragment() {
     ): View {
         _binding = FragmentAddUsersBinding.inflate(inflater, container, false)
         userService = RetrofitClient.createUserService(requireContext())
+        cartService = RetrofitClient.createCartService(requireContext()) // Initialize CartService
         return binding.root
     }
 
@@ -64,18 +68,23 @@ class AddUsersFragment : Fragment() {
             firstName = firstName,
             lastName = lastName,
             role = role,
-            status = "normal", // Added status
+            status = "normal",
             shippingAddress = address,
             phoneNumber = phone
         )
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // Create the user first
                 val newUser = userService.createUser(userRequest)
-                Toast.makeText(requireContext(), "Usuario '${newUser.username}' creado con éxito", Toast.LENGTH_LONG).show()
+                
+                // Immediately create a cart for the newly created user
+                val createCartRequest = CreateCartRequest(user_id = newUser.id)
+                cartService.createCart(createCartRequest)
+
+                Toast.makeText(requireContext(), "Usuario '${newUser.username}' y su carrito fueron creados con éxito", Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } catch (e: Exception) {
-                // --- Start of Enhanced Error Handling (copied from EditUsersFragment) ---
                 var errorMessage = "Error al crear usuario"
                 if (e is HttpException && e.code() == 400) {
                     try {
@@ -95,7 +104,6 @@ class AddUsersFragment : Fragment() {
                      errorMessage = e.message ?: errorMessage
                 }
                 Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
-                 // --- End of Enhanced Error Handling ---
             }
         }
     }

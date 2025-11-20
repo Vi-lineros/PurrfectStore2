@@ -27,17 +27,14 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    // The token can now be passed directly, to be used immediately after login,
-    // bypassing the need to read it from SharedPreferences.
     fun createAuthService(context: Context, requiresAuth: Boolean = false, token: String? = null): AuthService {
         val clientBuilder = baseOkHttpBuilder()
         if (requiresAuth) {
-            // Rewriting the logic to be more explicit and avoid the type mismatch error.
             val tokenProvider: () -> String?
             if (token != null) {
-                tokenProvider = { token } // Use the token passed as an argument
+                tokenProvider = { token }
             } else {
-                tokenProvider = { TokenManager(context).getToken() } // Fallback to getting token from storage
+                tokenProvider = { TokenManager(context).getToken() }
             }
             clientBuilder.addInterceptor(AuthInterceptor(tokenProvider))
         }
@@ -59,6 +56,15 @@ object RetrofitClient {
             .addInterceptor(AuthInterceptor{tokenManager.getToken()})
             .build()
         return retrofit(storeBaseUrl, client).create(UserService::class.java)
+    }
+
+    // New function to create the CartService
+    fun createCartService(context: Context): CartService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(CartService::class.java)
     }
 
     fun createUploadService(context: Context): UploadService {

@@ -90,5 +90,30 @@
         android:name="com.mycat.purrfectstore2.ui.fragments.EditProfileFragment"
         android:label="Editar Perfil"
         tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.CartFragment"
+        android:label="fragment_cart"
+        tools:layout="@layout/fragment_cart" />
+    <fragment
+        android:id="@+id/myOrdersFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.MyOrdersFragment"
+        android:label="fragment_my_orders"
+        tools:layout="@layout/fragment_my_orders" />
+    <fragment
+        android:id="@+id/orderDetailsFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.OrderDetailsFragment"
+        android:label="fragment_order_details"
+        tools:layout="@layout/fragment_order_details" />
+    <fragment
+        android:id="@+id/userOrderList"
+        android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderList"
+        android:label="fragment_user_order_list"
+        tools:layout="@layout/fragment_user_order_list" />
+    <fragment
+        android:id="@+id/userOrderDetailsFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderDetailsFragment"
+        android:label="fragment_user_order_details"
+        tools:layout="@layout/fragment_user_order_details" />
 
 </navigation>
