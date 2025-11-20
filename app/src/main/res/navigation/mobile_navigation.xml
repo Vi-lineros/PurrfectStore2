@@ -93,18 +93,30 @@
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.CartFragment"
-        android:label="fragment_cart"
+        android:label="Carrito"
         tools:layout="@layout/fragment_cart" />
+
+    <!-- Order Fragments -->
     <fragment
         android:id="@+id/myOrdersFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.MyOrdersFragment"
-        android:label="fragment_my_orders"
-        tools:layout="@layout/fragment_my_orders" />
+        android:label="Mis Pedidos"
+        tools:layout="@layout/fragment_my_orders" >
+        <action
+            android:id="@+id/action_myOrdersFragment_to_orderDetailsFragment"
+            app:destination="@id/orderDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/orderDetailsFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.OrderDetailsFragment"
-        android:label="fragment_order_details"
-        tools:layout="@layout/fragment_order_details" />
+        android:label="Detalles del Pedido"
+        tools:layout="@layout/fragment_order_details">
+        <argument
+            android:name="orderId"
+            app:argType="integer" />
+    </fragment>
+
+    <!-- Admin Order Fragments (Assuming these are for admins) -->
     <fragment
         android:id="@+id/userOrderList"
         android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderList"

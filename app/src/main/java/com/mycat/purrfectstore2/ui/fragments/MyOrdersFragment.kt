@@ -1,60 +1,107 @@
 package com.mycat.purrfectstore2.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.mycat.purrfectstore2.R
+import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.mycat.purrfectstore2.api.AuthService
+import com.mycat.purrfectstore2.api.RetrofitClient
+import com.mycat.purrfectstore2.databinding.FragmentMyOrdersBinding
+import com.mycat.purrfectstore2.ui.adapter.MyOrdersAdapter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MyOrdersFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MyOrdersFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentMyOrdersBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var authService: AuthService
+    private lateinit var ordersAdapter: MyOrdersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_orders, container, false)
+    ): View {
+        _binding = FragmentMyOrdersBinding.inflate(inflater, container, false)
+        authService = RetrofitClient.createAuthService(requireContext(), requiresAuth = true)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MyOrdersFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MyOrdersFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupSwipeToRefresh()
+        loadOrders()
+    }
+
+    private fun setupRecyclerView() {
+        ordersAdapter = MyOrdersAdapter(emptyList())
+        binding.recyclerViewOrders.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = ordersAdapter
+        }
+    }
+
+    private fun setupSwipeToRefresh() {
+        binding.swipeRefreshLayoutOrders.setOnRefreshListener {
+            loadOrders()
+        }
+    }
+
+    private fun loadOrders() {
+        // Show progress bar only if it's not a swipe refresh
+        if (!binding.swipeRefreshLayoutOrders.isRefreshing) {
+            setLoadingState(true)
+        }
+
+        lifecycleScope.launch {
+            try {
+                delay(500) // Prevent rate-limiting
+                val userProfile = authService.getMe()
+                
+                val completedOrders = userProfile.cart?.filter { it.status != "en proceso" } ?: emptyList()
+
+                if (completedOrders.isEmpty()) {
+                    showEmptyState(true)
+                } else {
+                    showEmptyState(false)
+                    // Sort orders by creation date, newest first
+                    ordersAdapter.updateOrders(completedOrders.sortedByDescending { it.created_at })
                 }
+
+            } catch (e: Exception) {
+                showError("Error al cargar los pedidos: ${e.message}")
+                showEmptyState(true)
+            } finally {
+                setLoadingState(false)
             }
+        }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBarOrders.isVisible = isLoading
+        if (!isLoading) {
+            binding.swipeRefreshLayoutOrders.isRefreshing = false
+        }
+    }
+
+    private fun showEmptyState(isEmpty: Boolean) {
+        binding.textViewNoOrders.isVisible = isEmpty
+        binding.recyclerViewOrders.isVisible = !isEmpty
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

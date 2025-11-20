@@ -20,6 +20,9 @@ interface CartService {
         @Body updateRequest: UpdateCartProductsRequest
     ): Cart
     
+    @PATCH("cart/{id}")
+    suspend fun updateCartStatus(@Path("id") cartId: Int, @Body statusRequest: UpdateCartStatusRequest): Cart
+
     // Deletes an entire cart. This might be useful for other flows.
     @DELETE("cart/{cart_id}")
     suspend fun deleteCart(@Path("cart_id") cartId: Int)

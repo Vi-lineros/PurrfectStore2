@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.mycat.purrfectstore2.api.CartService
+import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentProductDetailsBinding
@@ -20,6 +21,10 @@ import com.mycat.purrfectstore2.model.Product
 import com.mycat.purrfectstore2.model.UpdateCartProductsRequest
 import com.mycat.purrfectstore2.ui.adapter.ImageSliderAdapter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -28,6 +33,7 @@ class ProductDetailFragment : Fragment() {
     private var _binding: FragmentProductDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var cartService: CartService
+    private lateinit var productService: ProductService
     private lateinit var tokenManager: TokenManager
     private var currentProduct: Product? = null
 
@@ -37,6 +43,7 @@ class ProductDetailFragment : Fragment() {
     ): View {
         _binding = FragmentProductDetailsBinding.inflate(inflater, container, false)
         cartService = RetrofitClient.createCartService(requireContext())
+        productService = RetrofitClient.createProductService(requireContext())
         tokenManager = TokenManager(requireContext())
         return binding.root
     }
@@ -55,7 +62,7 @@ class ProductDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val product = withContext(Dispatchers.IO) {
-                    RetrofitClient.createProductService(requireContext()).getProductId(productId)
+                    productService.getProductId(productId)
                 }
                 currentProduct = product
                 updateUI(product)
@@ -73,12 +80,28 @@ class ProductDetailFragment : Fragment() {
         setupQuantityButtons(product.stock)
         setupAddToCartButton(product.id)
     }
-    
+
+    private suspend fun fetchProductDetailsForList(products: List<CartProduct>): List<CartProduct> = coroutineScope {
+        products.map { cartProduct ->
+            async {
+                if (cartProduct.product_details == null) {
+                    try {
+                        cartProduct.product_details = productService.getProductId(cartProduct.product_id)
+                    } catch (e: Exception) {
+                        // Could not fetch details, it won't be part of total calculation
+                    }
+                }
+                cartProduct
+            }
+        }.awaitAll()
+    }
+
     private fun setupAddToCartButton(productId: Int) {
         binding.buttonAddToCart.setOnClickListener { 
             binding.buttonAddToCart.isEnabled = false
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
+                    delay(500) // Add a delay to prevent rate limiting
                     val cartId = tokenManager.getCartId()
                     val stock = currentProduct?.stock ?: 0
                     if (cartId == -1) throw IllegalStateException("Sesión o carrito no válidos.")
@@ -96,13 +119,25 @@ class ProductDetailFragment : Fragment() {
                         if (existingProduct != null) {
                             existingProduct.quantity += quantityToAdd
                         } else {
-                            updatedProductList.add(CartProduct(product_id = productId, quantity = quantityToAdd))
+                            val newCartProduct = CartProduct(
+                                product_id = productId, 
+                                quantity = quantityToAdd,
+                                product_details = currentProduct
+                            )
+                            updatedProductList.add(newCartProduct)
                         }
 
-                        val updateRequest = UpdateCartProductsRequest(products = updatedProductList)
+                        val populatedList = fetchProductDetailsForList(updatedProductList)
+                        val newTotal = populatedList.sumOf { (it.product_details?.price ?: 0.0) * it.quantity }
+
+                        val cleanProductList = populatedList.map { 
+                            CartProduct(product_id = it.product_id, quantity = it.quantity)
+                        }
+
+                        val updateRequest = UpdateCartProductsRequest(products = cleanProductList, total = newTotal)
                         cartService.updateCart(cartId, updateRequest)
 
-                        Toast.makeText(requireContext(), "Producto añadido/actualizado en el carrito", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
                     }
 
                 } catch (e: Exception) {

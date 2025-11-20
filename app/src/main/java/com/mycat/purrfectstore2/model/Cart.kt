@@ -14,24 +14,29 @@ data class CartProduct(
 // Represents the main cart object from your 'cart' table
 data class Cart(
     val id: Int,
+    @SerializedName("created_at")
+    val created_at: Long, // Made this non-nullable for date calculations
     val user_id: Int,
     val status: String,
-    val total: Double?, // Total can also be null for an empty cart
-    // This is now nullable to safely handle empty carts from the API
+    val total: Double?,
     @SerializedName("product_id")
     val product_id: List<CartProduct>? 
 )
 
 // Request body for creating a new cart
-// The @SerializedName annotation ensures the JSON field is named correctly.
 data class CreateCartRequest(
     @SerializedName("user_id")
     val user_id: Int
 )
 
-// Request body for updating the cart via PATCH
-// It will send the complete, updated list of products.
+// Request body for updating the cart via PATCH. Now includes the total.
 data class UpdateCartProductsRequest(
     @SerializedName("product_id")
-    val products: List<CartProduct>
+    val products: List<CartProduct>,
+    val total: Double
+)
+
+// Request body for updating just the cart's status
+data class UpdateCartStatusRequest(
+    val status: String
 )

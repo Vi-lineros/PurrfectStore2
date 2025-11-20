@@ -82,7 +82,7 @@ class AddUsersFragment : Fragment() {
                 val createCartRequest = CreateCartRequest(user_id = newUser.id)
                 cartService.createCart(createCartRequest)
 
-                Toast.makeText(requireContext(), "Usuario '${newUser.username}' y su carrito fueron creados con éxito", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "¡Usuario creado con éxito!", Toast.LENGTH_LONG).show()
                 findNavController().navigateUp()
             } catch (e: Exception) {
                 var errorMessage = "Error al crear usuario"
