@@ -30,11 +30,10 @@ object RetrofitClient {
     fun createAuthService(context: Context, requiresAuth: Boolean = false, token: String? = null): AuthService {
         val clientBuilder = baseOkHttpBuilder()
         if (requiresAuth) {
-            val tokenProvider: () -> String?
-            if (token != null) {
-                tokenProvider = { token }
+            val tokenProvider: () -> String? = if (token != null) {
+                { token }
             } else {
-                tokenProvider = { TokenManager(context).getToken() }
+                { TokenManager(context).getToken() }
             }
             clientBuilder.addInterceptor(AuthInterceptor(tokenProvider))
         }
@@ -58,7 +57,6 @@ object RetrofitClient {
         return retrofit(storeBaseUrl, client).create(UserService::class.java)
     }
 
-    // New function to create the CartService
     fun createCartService(context: Context): CartService {
         val tokenManager = TokenManager(context)
         val client = baseOkHttpBuilder()

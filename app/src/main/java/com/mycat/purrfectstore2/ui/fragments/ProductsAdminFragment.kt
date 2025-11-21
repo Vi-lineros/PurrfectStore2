@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -131,6 +132,7 @@ class ProductsAdminFragment : Fragment() {
         val itemsToDelete = productAdapter.selectedItems.toList()
 
         viewLifecycleOwner.lifecycleScope.launch {
+            setLoadingState(true) // Lock UI for deletion
             try {
                 itemsToDelete.forEach { productId ->
                     productService.deleteProduct(productId)
@@ -140,6 +142,8 @@ class ProductsAdminFragment : Fragment() {
                 loadProducts()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                setLoadingState(false) // Unlock UI
             }
         }
     }
@@ -172,7 +176,7 @@ class ProductsAdminFragment : Fragment() {
     }
 
     private fun loadProducts() {
-        binding.progressBar.visibility = View.VISIBLE
+        setLoadingState(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val productsFromApi = productService.getProducts()
@@ -181,9 +185,15 @@ class ProductsAdminFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(context, "Error loading products: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
-                binding.progressBar.visibility = View.GONE
+                setLoadingState(false)
             }
         }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
+        binding.recyclerViewProducts.isVisible = !isLoading
     }
 
     override fun onDestroyView() {

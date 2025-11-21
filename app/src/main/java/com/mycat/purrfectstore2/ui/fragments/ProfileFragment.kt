@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,6 +18,7 @@ import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentProfileBinding
 import com.mycat.purrfectstore2.model.User
+import com.mycat.purrfectstore2.ui.HomeActivity
 import com.mycat.purrfectstore2.ui.MainActivity
 import kotlinx.coroutines.launch
 
@@ -44,13 +46,23 @@ class ProfileFragment : Fragment() {
         setupLogoutButton()
     }
 
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBarProfile.isVisible = isLoading
+        binding.contentContainer.isVisible = !isLoading
+        binding.fabEditProfile.isVisible = !isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
+    }
+
     private fun loadUserProfile() {
+        setLoadingState(true)
         lifecycleScope.launch {
             try {
                 val userProfile = authService.getMe()
                 populateUI(userProfile)
             } catch (e: Exception) {
                 Toast.makeText(context, "Error al cargar el perfil: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                setLoadingState(false)
             }
         }
     }

@@ -19,6 +19,7 @@ import com.mycat.purrfectstore2.model.CartProduct
 import com.mycat.purrfectstore2.model.CreateCartRequest
 import com.mycat.purrfectstore2.model.UpdateCartProductsRequest
 import com.mycat.purrfectstore2.model.UpdateCartStatusRequest
+import com.mycat.purrfectstore2.ui.HomeActivity
 import com.mycat.purrfectstore2.ui.adapter.CartAdapter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -135,6 +136,7 @@ class CartFragment : Fragment() {
 
                 val cartId = tokenManager.getCartId()
                 if (cartId == -1) {
+                    cartAdapter.updateItems(emptyList())
                     showEmptyState(true)
                     updateGrandTotal()
                     setLoadingState(false)
@@ -145,6 +147,7 @@ class CartFragment : Fragment() {
                 val cartProducts = cart.product_id
 
                 if (cartProducts.isNullOrEmpty()) {
+                    cartAdapter.updateItems(emptyList())
                     showEmptyState(true)
                     updateGrandTotal()
                 } else {
@@ -154,6 +157,7 @@ class CartFragment : Fragment() {
                     updateGrandTotal()
                 }
             } catch (e: Exception) {
+                cartAdapter.updateItems(emptyList())
                 showError("Error al cargar el carrito: ${e.message}")
                 showEmptyState(true)
             } finally {
@@ -212,6 +216,8 @@ class CartFragment : Fragment() {
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBarCart.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+
         if (isLoading) {
             binding.recyclerViewCart.isVisible = false
             binding.totalContainer.isVisible = false

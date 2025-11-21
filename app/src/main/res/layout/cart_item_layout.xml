@@ -87,7 +87,7 @@
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:color="@color/black"
+                android:textColor="@color/black"
                 android:minWidth="0dp"
                 android:padding="0dp"
                 android:text="-"
@@ -108,7 +108,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:minWidth="0dp"
-                android:color="@color/black"
+                android:textColor="@color/black"
                 android:padding="0dp"
                 android:text="+"
                 app:iconPadding="0dp" />

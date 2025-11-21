@@ -1,3 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/productFragment"
+        android:icon="@drawable/ic_menu_cart" 
+        android:title="Productos" />
+
+    <item
+        android:id="@+id/cartFragment"
+        android:icon="@drawable/ic_menu_cart"
+        android:title="Carrito" />
+
+    <item
+        android:id="@+id/myOrdersFragment"
+        android:icon="@drawable/ic_menu_cart" 
+        android:title="Mis Pedidos" />
+
+    <!-- Admin Section -->
+    <group android:id="@+id/admin_section" android:visible="false">
+        <item
+            android:id="@+id/userOrderList"
+            android:icon="@drawable/ic_menu_cart" 
+            android:title="Pedidos" />
+    </group>
+
+</menu>

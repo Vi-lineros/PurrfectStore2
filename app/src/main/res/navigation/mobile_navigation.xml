@@ -39,7 +39,7 @@
     <fragment
         android:id="@+id/productsAdminFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment"
-        android:label="Administración"
+        android:label="Administración de productos"
         tools:layout="@layout/fragment_products_admin">
         <action
             android:id="@+id/action_productsAdminFragment_to_addProductFragment"
@@ -116,16 +116,39 @@
             app:argType="integer" />
     </fragment>
 
-    <!-- Admin Order Fragments (Assuming these are for admins) -->
+    <!-- Admin Order Fragments -->
     <fragment
         android:id="@+id/userOrderList"
         android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderList"
-        android:label="fragment_user_order_list"
-        tools:layout="@layout/fragment_user_order_list" />
+        android:label="Pedidos de Clientes"
+        tools:layout="@layout/fragment_user_order_list">
+        <action
+            android:id="@+id/action_userOrderList_to_userOrderDetailsFragment"
+            app:destination="@id/userOrderDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userOrderDetailsFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderDetailsFragment"
-        android:label="fragment_user_order_details"
-        tools:layout="@layout/fragment_user_order_details" />
+        android:label="Detalles del Pedido de Cliente"
+        tools:layout="@layout/fragment_user_order_details">
+        <argument
+            android:name="orderId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_userOrderDetailsFragment_to_productDetailsOrderFragment"
+            app:destination="@id/productDetailsOrderFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/productDetailsOrderFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.ProductDetailsOrderFragment"
+        android:label="Detalles del Producto"
+        tools:layout="@layout/fragment_product_details_order" >
+        <argument
+            android:name="productId"
+            app:argType="integer" />
+        <argument
+            android:name="quantity"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>

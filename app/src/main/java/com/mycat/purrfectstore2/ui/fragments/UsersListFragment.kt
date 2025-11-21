@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -127,6 +128,7 @@ class UsersListFragment : Fragment() {
     private fun updateUserStatus(user: User, newStatus: String, successMessage: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                setLoadingState(true) // Lock UI
                 val fullUserData = mutableMapOf<String, @JvmSuppressWildcards Any>()
                 fullUserData["name"] = user.username
                 fullUserData["email"] = user.email
@@ -142,6 +144,8 @@ class UsersListFragment : Fragment() {
                 loadUsers()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al actualizar estado: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                setLoadingState(false) // Unlock UI
             }
         }
     }
@@ -187,6 +191,7 @@ class UsersListFragment : Fragment() {
         val deleteWord = if (itemsToDelete.size == 1) "eliminado" else "eliminados"
 
         viewLifecycleOwner.lifecycleScope.launch {
+            setLoadingState(true) // Lock UI
             try {
                 itemsToDelete.forEach { userId ->
                     userService.deleteUser(userId)
@@ -196,6 +201,8 @@ class UsersListFragment : Fragment() {
                 loadUsers()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                setLoadingState(false) // Unlock UI
             }
         }
     }
@@ -229,7 +236,7 @@ class UsersListFragment : Fragment() {
     }
 
     private fun loadUsers() {
-        binding.progressBar.visibility = View.VISIBLE
+        setLoadingState(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val usersFromApi = userService.getUsers()
@@ -238,9 +245,15 @@ class UsersListFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(context, "Error cargando usuarios: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
-                binding.progressBar.visibility = View.GONE
+                setLoadingState(false)
             }
         }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
+        binding.recyclerViewUsers.isVisible = !isLoading
     }
 
     override fun onDestroyView() {

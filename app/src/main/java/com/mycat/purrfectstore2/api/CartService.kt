@@ -13,6 +13,10 @@ interface CartService {
     @GET("cart/{cart_id}")
     suspend fun getCart(@Path("cart_id") cartId: Int): Cart
 
+    // Gets all carts (for admin purposes)
+    @GET("cart")
+    suspend fun getCarritos(): List<Cart>
+
     // Updates the list of products in the cart using its ID
     @PATCH("cart/{cart_id}")
     suspend fun updateCart(

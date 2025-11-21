@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mycat.purrfectstore2.api.AuthService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.databinding.FragmentMyOrdersBinding
+import com.mycat.purrfectstore2.ui.HomeActivity
 import com.mycat.purrfectstore2.ui.adapter.MyOrdersAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,14 +56,13 @@ class MyOrdersFragment : Fragment() {
     }
 
     private fun loadOrders() {
-        // Show progress bar only if it's not a swipe refresh
         if (!binding.swipeRefreshLayoutOrders.isRefreshing) {
             setLoadingState(true)
         }
 
         lifecycleScope.launch {
             try {
-                delay(500) // Prevent rate-limiting
+                delay(1500) // Set delay to 1.5 seconds
                 val userProfile = authService.getMe()
                 
                 val completedOrders = userProfile.cart?.filter { it.status != "en proceso" } ?: emptyList()
@@ -71,7 +71,6 @@ class MyOrdersFragment : Fragment() {
                     showEmptyState(true)
                 } else {
                     showEmptyState(false)
-                    // Sort orders by creation date, newest first
                     ordersAdapter.updateOrders(completedOrders.sortedByDescending { it.created_at })
                 }
 
@@ -86,6 +85,14 @@ class MyOrdersFragment : Fragment() {
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBarOrders.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+
+        // Hide content while loading
+        if (isLoading) {
+            binding.recyclerViewOrders.isVisible = false
+            binding.textViewNoOrders.isVisible = false
+        }
+        
         if (!isLoading) {
             binding.swipeRefreshLayoutOrders.isRefreshing = false
         }

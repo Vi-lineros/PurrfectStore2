@@ -1,60 +1,124 @@
 package com.mycat.purrfectstore2.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.mycat.purrfectstore2.R
+import android.widget.SearchView
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.mycat.purrfectstore2.api.CartService
+import com.mycat.purrfectstore2.api.RetrofitClient
+import com.mycat.purrfectstore2.api.UserService
+import com.mycat.purrfectstore2.databinding.FragmentUserOrderListBinding
+import com.mycat.purrfectstore2.model.User
+import com.mycat.purrfectstore2.ui.HomeActivity
+import com.mycat.purrfectstore2.ui.adapter.OrderWithUser
+import com.mycat.purrfectstore2.ui.adapter.UserOrderListAdapter
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [UserOrderList.newInstance] factory method to
- * create an instance of this fragment.
- */
 class UserOrderList : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentUserOrderListBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var orderAdapter: UserOrderListAdapter
+    private lateinit var cartService: CartService
+    private lateinit var userService: UserService
+    private var allOrders: List<OrderWithUser> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_order_list, container, false)
+    ): View {
+        _binding = FragmentUserOrderListBinding.inflate(inflater, container, false)
+        cartService = RetrofitClient.createCartService(requireContext())
+        userService = RetrofitClient.createUserService(requireContext())
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UserOrderList.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserOrderList().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupSearchView()
+        loadOrdersAndUsers()
+    }
+
+    private fun setupRecyclerView() {
+        orderAdapter = UserOrderListAdapter(emptyList())
+        binding.recyclerViewUserOrders.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = orderAdapter
+        }
+    }
+
+    private fun setupSearchView() {
+        binding.searchViewUserOrders.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
             }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                (binding.recyclerViewUserOrders.adapter as? UserOrderListAdapter)?.filter(newText)
+                return true
+            }
+        })
+    }
+
+    private fun loadOrdersAndUsers() {
+        setLoadingState(true)
+        lifecycleScope.launch {
+            try {
+                // Fetch all carts and all users in parallel
+                val cartsDeferred = async { cartService.getCarritos() }
+                val usersDeferred = async { userService.getUsers() }
+
+                val allCarts = cartsDeferred.await()
+                val allUsers = usersDeferred.await()
+
+                // Filter out carts with "en proceso" status
+                val filteredCarts = allCarts.filter { it.status.lowercase(Locale.getDefault()) != "en proceso" }
+
+                // Create a map of user IDs to usernames for quick lookup
+                val userMap = allUsers.associateBy(User::id, User::username)
+
+                // Combine carts with usernames
+                val ordersWithUsers = filteredCarts.mapNotNull { cart ->
+                    userMap[cart.user_id]?.let { username ->
+                        OrderWithUser(cart, username)
+                    }
+                }
+
+                allOrders = ordersWithUsers.sortedByDescending { it.cart.created_at }
+                orderAdapter.updateOrders(allOrders)
+                updateEmptyState(allOrders.isEmpty())
+
+            } catch (e: Exception) {
+                updateEmptyState(true)
+            } finally {
+                setLoadingState(false)
+            }
+        }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBarUserOrders.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        binding.recyclerViewUserOrders.isVisible = !isLoading
+        if (isLoading) {
+             binding.textViewNoOrders.isVisible = false
+        }
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        binding.textViewNoOrders.isVisible = isEmpty
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

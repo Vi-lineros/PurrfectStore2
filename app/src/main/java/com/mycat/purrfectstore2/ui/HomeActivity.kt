@@ -46,7 +46,7 @@ class HomeActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
-                R.id.myOrdersFragment, R.id.usersOrderListFragment,
+                R.id.myOrdersFragment, R.id.userOrderList,
                 R.id.usersListFragment, R.id.productsAdminFragment
             ), drawerLayout
         )
@@ -66,7 +66,6 @@ class HomeActivity : AppCompatActivity() {
         setupDrawerHeader()
         setupRoleBasedMenu()
 
-        // This listener will now handle both fragment types
         cancelButton.setOnClickListener {
             val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
             when (currentFragment) {
@@ -74,6 +73,17 @@ class HomeActivity : AppCompatActivity() {
                 is UsersListFragment -> currentFragment.exitSelectionMode()
             }
         }
+    }
+    
+    fun setDrawerLocked(isLocked: Boolean) {
+        val lockMode = if (isLocked) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED
+        binding.drawerLayout.setDrawerLockMode(lockMode)
+    }
+
+    fun showCancelButton(show: Boolean) {
+        cancelButton.visibility = if (show) View.VISIBLE else View.GONE
+        supportActionBar?.setDisplayHomeAsUpEnabled(!show)
+        setDrawerLocked(show) // Re-use the drawer locking logic
     }
 
     private fun setupDrawerHeader() {
@@ -89,18 +99,11 @@ class HomeActivity : AppCompatActivity() {
         val isAdmin = userRole.equals("admin", ignoreCase = true)
         
         val navView: NavigationView = binding.navView
-        navView.menu.setGroupVisible(R.id.group_admin, isAdmin)
+        navView.menu.setGroupVisible(R.id.admin_section, isAdmin)
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    fun showCancelButton(show: Boolean) {
-        cancelButton.visibility = if (show) View.VISIBLE else View.GONE
-        supportActionBar?.setDisplayHomeAsUpEnabled(!show)
-        val lockMode = if (show) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED
-        binding.drawerLayout.setDrawerLockMode(lockMode)
     }
 
     private fun showLogoutConfirmationDialog() {

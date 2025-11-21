@@ -29,9 +29,9 @@
         <item
             android:id="@+id/productsAdminFragment"
             android:icon="@drawable/ic_menu_products"
-            android:title="Productos Admin" />
+            android:title="Productos" />
         <item
-            android:id="@+id/usersOrderListFragment"
+            android:id="@+id/userOrderList"
             android:icon="@drawable/ic_menu_confirm_order"
             android:title="Pedidos" />
         <item

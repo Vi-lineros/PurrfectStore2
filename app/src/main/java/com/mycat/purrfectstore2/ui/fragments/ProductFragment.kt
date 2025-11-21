@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.databinding.FragmentProductBinding
 import com.mycat.purrfectstore2.model.Product
+import com.mycat.purrfectstore2.ui.HomeActivity
 import com.mycat.purrfectstore2.ui.adapter.ProductAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,8 +44,12 @@ class ProductFragment : Fragment() {
     private fun setupRecyclerView() {
         productAdapter = ProductAdapter(
             onProductClicked = { product ->
-                val action = ProductFragmentDirections.actionNavProductToNavProductDetails2(product.id)
-                findNavController().navigate(action)
+                if (product.stock > 0) {
+                    val action = ProductFragmentDirections.actionNavProductToNavProductDetails2(product.id)
+                    findNavController().navigate(action)
+                } else {
+                    Toast.makeText(context, "Este producto no tiene stock", Toast.LENGTH_SHORT).show()
+                }
             },
             onProductLongClicked = {},
             onSelectionChanged = {}
@@ -82,7 +88,7 @@ class ProductFragment : Fragment() {
     }
 
     private fun loadProducts() {
-        binding.progressBar.visibility = View.VISIBLE
+        setLoadingState(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val productsFromApi = withContext(Dispatchers.IO) {
@@ -95,9 +101,15 @@ class ProductFragment : Fragment() {
                 Log.e("ProductFragment", "Error al cargar productos: ${e.message}", e)
                 Toast.makeText(context, "Error al cargar productos", Toast.LENGTH_LONG).show()
             } finally {
-                binding.progressBar.visibility = View.GONE
+                setLoadingState(false)
             }
         }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        binding.recyclerViewProducts.isVisible = !isLoading
     }
 
     override fun onDestroyView() {

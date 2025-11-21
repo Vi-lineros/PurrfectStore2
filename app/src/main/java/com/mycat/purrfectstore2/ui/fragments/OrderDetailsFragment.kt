@@ -75,7 +75,7 @@ class OrderDetailsFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                delay(500) // Add a delay to prevent rate limiting
+                delay(1500) // Set delay to 1.5 seconds
                 // Fetch order and user details concurrently
                 val orderDeferred = async { cartService.getCart(orderId) }
                 val userDeferred = async { authService.getMe() }

@@ -1,5 +1,6 @@
 package com.mycat.purrfectstore2.ui.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mycat.purrfectstore2.databinding.ItemProductBinding
 import com.mycat.purrfectstore2.model.Product
+import java.text.NumberFormat
+import java.util.Locale
 
 class ProductAdapter(
     private val onProductClicked: (Product) -> Unit,
@@ -52,9 +55,17 @@ class ProductAdapter(
 
     inner class ProductViewHolder(val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(product: Product) {
+            val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
             binding.textViewProductName.text = product.name
-            binding.textViewProductPrice.text = "$ ${product.price}"
-            binding.textViewProductStock.text = "Stock: ${product.stock}"
+            binding.textViewProductPrice.text = currencyFormat.format(product.price)
+
+            if (product.stock > 0) {
+                binding.textViewProductStock.text = "Stock: ${product.stock}"
+                binding.root.alpha = 1.0f
+            } else {
+                binding.textViewProductStock.text = "Sin stock"
+                binding.root.alpha = 0.6f // Fade out the item
+            }
 
             if (product.images.isNotEmpty()) {
                 Glide.with(itemView.context)
@@ -69,12 +80,10 @@ class ProductAdapter(
             binding.selectionOverlay.visibility = if (selectedItems.contains(product.id)) View.VISIBLE else View.GONE
 
             binding.root.setOnClickListener {
-                // The fragment will now handle this logic based on isSelectionMode
-                onProductClicked(product)
+                onProductClicked(product) // Let the fragment decide what to do
             }
 
             binding.root.setOnLongClickListener {
-                // Fragment handles this
                 onProductLongClicked(product)
                 true
             }

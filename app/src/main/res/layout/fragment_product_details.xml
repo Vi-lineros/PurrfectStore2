@@ -108,17 +108,37 @@
                     android:textColor="?attr/colorOnPrimary"
                     tools:text="Aquí va una descripción detallada y completa del producto, explicando sus características, materiales y todo lo que el cliente necesita saber." />
 
-                <TextView
-                    android:id="@+id/textViewDetailProductStock"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:drawablePadding="8dp"
-                    tools:text="Stock disponible: 15" />
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        android:id="@+id/textViewDetailProductStock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:text="Stock disponible: 15" />
+
+                    <TextView
+                        android:id="@+id/textViewDetailProductPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:text="$19.99 /un" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -142,6 +162,7 @@
                 android:padding="16dp">
 
                 <LinearLayout
+                    android:id="@+id/quantityControls"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
