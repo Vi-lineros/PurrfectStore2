@@ -174,7 +174,7 @@ El proyecto utiliza:
 
 11. APK
 
-(Agregar aquí el enlace cuando el archivo sea subido al repositorio.)
+https://github.com/Vi-lineros/PurrfectStore2/releases/download/v1.0/app-release.apk
 
 12. Autor
 
