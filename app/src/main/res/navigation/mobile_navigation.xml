@@ -3,7 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/productFragment">
+    app:startDestination="@id/welcomeFragment">
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.WelcomeFragment"
+        android:label="Bienvenido"
+        tools:layout="@layout/fragment_welcome">
+        <action
+            android:id="@+id/action_welcomeFragment_to_productFragment"
+            app:destination="@id/productFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_productsAdminFragment"
+            app:destination="@id/productsAdminFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.ProfileFragment"
@@ -35,6 +53,9 @@
         <argument
             android:name="productId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_productDetailFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
     </fragment>
     <fragment
         android:id="@+id/productsAdminFragment"
@@ -94,7 +115,11 @@
         android:id="@+id/cartFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.CartFragment"
         android:label="Carrito"
-        tools:layout="@layout/fragment_cart" />
+        tools:layout="@layout/fragment_cart" >
+        <action
+            android:id="@+id/action_cartFragment_to_paymentFragment"
+            app:destination="@id/paymentFragment" />
+    </fragment>
 
     <!-- Order Fragments -->
     <fragment
@@ -149,6 +174,22 @@
         <argument
             android:name="quantity"
             app:argType="integer" />
+    </fragment>
+    
+    <!-- Payment Fragment -->
+    <fragment
+        android:id="@+id/paymentFragment"
+        android:name="com.mycat.purrfectstore2.ui.fragments.PaymentFragment"
+        android:label="Procesar Pago"
+        tools:layout="@layout/fragment_payment">
+        <action
+            android:id="@+id/action_paymentFragment_to_myOrdersFragment"
+            app:destination="@id/myOrdersFragment"
+            app:popUpTo="@id/productFragment"
+            app:popUpToInclusive="false" />
+        <argument
+            android:name="totalAmount"
+            app:argType="float" />
     </fragment>
 
 </navigation>

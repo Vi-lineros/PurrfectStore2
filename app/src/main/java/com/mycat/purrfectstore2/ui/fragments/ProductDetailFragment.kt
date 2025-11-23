@@ -2,6 +2,7 @@ package com.mycat.purrfectstore2.ui.fragments
 
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.mycat.purrfectstore2.R
@@ -58,8 +60,10 @@ class ProductDetailFragment : Fragment() {
         val productId = args.productId
         if (productId != -1) {
             loadProductDetails(productId)
-        } else {
-            Toast.makeText(context, "Error: ID de producto no válido.", Toast.LENGTH_LONG).show()
+        }
+
+        binding.buttonGoToCart.setOnClickListener {
+            findNavController().navigate(R.id.action_productDetailFragment_to_cartFragment)
         }
     }
 
@@ -159,9 +163,11 @@ class ProductDetailFragment : Fragment() {
                         cartService.updateCart(cartId, updateRequest)
 
                         Toast.makeText(requireContext(), "Producto añadido al carrito", Toast.LENGTH_SHORT).show()
+                        binding.buttonGoToCart.visibility = View.VISIBLE
                     }
 
                 } catch (e: Exception) {
+                    Log.e("AddToCart", "Error al añadir al carrito: ${e.message}", e)
                     Toast.makeText(requireContext(), "Intentelo denuevo mas tarde", Toast.LENGTH_LONG).show()
                 } finally {
                     binding.buttonAddToCart.isEnabled = true
@@ -223,8 +229,6 @@ class ProductDetailFragment : Fragment() {
             if (quantity < maxStock) {
                 quantity++
                 binding.textViewQuantity.text = quantity.toString()
-            } else {
-                Toast.makeText(requireContext(), "No hay más stock disponible", Toast.LENGTH_SHORT).show()
             }
         }
         binding.buttonDecrease.setOnClickListener {

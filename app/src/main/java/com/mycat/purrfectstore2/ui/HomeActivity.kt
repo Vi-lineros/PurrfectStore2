@@ -5,9 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -16,10 +19,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.mycat.purrfectstore2.R
+import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.ActivityHomeBinding
 import com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment
 import com.mycat.purrfectstore2.ui.fragments.UsersListFragment
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -40,11 +45,13 @@ class HomeActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
         navController = navHostFragment.navController
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
+                R.id.welcomeFragment, // Added welcome fragment to top-level
                 R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
                 R.id.myOrdersFragment, R.id.userOrderList,
                 R.id.usersListFragment, R.id.productsAdminFragment
@@ -95,11 +102,24 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupRoleBasedMenu() {
-        val userRole = tokenManager.getUserRole()
-        val isAdmin = userRole.equals("admin", ignoreCase = true)
-        
+        val userRole = tokenManager.getUserRole() ?: "cliente"
         val navView: NavigationView = binding.navView
-        navView.menu.setGroupVisible(R.id.admin_section, isAdmin)
+        val menu = navView.menu
+
+        when {
+            userRole.equals("supremo", ignoreCase = true) -> {
+                menu.setGroupVisible(R.id.group_admin, true)
+                menu.setGroupVisible(R.id.group_client, true)
+            }
+            userRole.equals("admin", ignoreCase = true) -> {
+                menu.setGroupVisible(R.id.group_admin, true)
+                menu.setGroupVisible(R.id.group_client, false)
+            }
+            else -> {
+                menu.setGroupVisible(R.id.group_admin, false)
+                menu.setGroupVisible(R.id.group_client, true)
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

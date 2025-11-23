@@ -240,7 +240,9 @@ class UsersListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val usersFromApi = userService.getUsers()
-                allUsers = usersFromApi
+                allUsers = usersFromApi.filter { user -> 
+                    !user.role.equals("supremo", ignoreCase = true) 
+                }
                 userAdapter.updateData(allUsers)
             } catch (e: Exception) {
                 Toast.makeText(context, "Error cargando usuarios: ${e.message}", Toast.LENGTH_LONG).show()

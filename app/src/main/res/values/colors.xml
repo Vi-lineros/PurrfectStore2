@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="vainilla_pastel">#F3E5AB</color>
     <color name="selected_item_color">#33007BFF</color> <!-- Azul semitransparente para selección -->
+    <color name="green">#4CAF50</color> <!-- Verde para validación correcta -->
 </resources>

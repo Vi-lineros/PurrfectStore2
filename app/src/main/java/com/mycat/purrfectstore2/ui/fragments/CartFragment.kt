@@ -8,17 +8,16 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mycat.purrfectstore2.api.AuthService
+import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.CartService
 import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentCartBinding
 import com.mycat.purrfectstore2.model.CartProduct
-import com.mycat.purrfectstore2.model.CreateCartRequest
 import com.mycat.purrfectstore2.model.UpdateCartProductsRequest
-import com.mycat.purrfectstore2.model.UpdateCartStatusRequest
 import com.mycat.purrfectstore2.ui.HomeActivity
 import com.mycat.purrfectstore2.ui.adapter.CartAdapter
 import kotlinx.coroutines.async
@@ -36,7 +35,6 @@ class CartFragment : Fragment() {
 
     private lateinit var cartService: CartService
     private lateinit var productService: ProductService
-    private lateinit var authService: AuthService
     private lateinit var tokenManager: TokenManager
     private lateinit var cartAdapter: CartAdapter
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
@@ -48,7 +46,6 @@ class CartFragment : Fragment() {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
         cartService = RetrofitClient.createCartService(requireContext())
         productService = RetrofitClient.createProductService(requireContext())
-        authService = RetrofitClient.createAuthService(requireContext(), requiresAuth = true)
         tokenManager = TokenManager(requireContext())
         return binding.root
     }
@@ -73,56 +70,11 @@ class CartFragment : Fragment() {
 
     private fun setupButtons() {
         binding.buttonUpdateCart.setOnClickListener {
-            updateCart()
+            updateCart(andThenNavigate = false)
         }
         binding.buttonCheckout.setOnClickListener {
-            handleCheckout()
-        }
-    }
-
-    private fun handleCheckout() {
-        setLoadingState(true)
-        lifecycleScope.launch {
-            try {
-                delay(500) // Add a delay to prevent rate limiting
-                val user = authService.getMe()
-
-                if (user.shippingAddress.isNullOrBlank()) {
-                    Toast.makeText(context, "Por favor actualice la direccion en su perfil", Toast.LENGTH_LONG).show()
-                    setLoadingState(false)
-                    return@launch
-                }
-
-                if (user.cart?.any { it.status == "pendiente" } == true) {
-                    Toast.makeText(context, "Ya tienes un pedido pendiente. No puedes enviar otro.", Toast.LENGTH_LONG).show()
-                    setLoadingState(false)
-                    return@launch
-                }
-
-                val currentCartId = tokenManager.getCartId()
-                if (currentCartId == -1) throw IllegalStateException("Carrito actual no válido")
-
-                val finalItems = cartAdapter.getItems().filter { it.quantity > 0 }
-                val finalTotal = finalItems.sumOf { (it.product_details?.price ?: 0.0) * it.quantity }
-
-                val updateRequest = UpdateCartProductsRequest(products = finalItems, total = finalTotal)
-                cartService.updateCart(currentCartId, updateRequest)
-
-                cartService.updateCartStatus(currentCartId, UpdateCartStatusRequest("pendiente"))
-
-                val newCartRequest = CreateCartRequest(user_id = user.id)
-                val newCart = cartService.createCart(newCartRequest)
-
-                tokenManager.saveCartId(newCart.id)
-
-                Toast.makeText(context, "¡Pedido enviado con éxito!", Toast.LENGTH_SHORT).show()
-
-                loadCart()
-
-            } catch (e: Exception) {
-                showError("Error al enviar el pedido: ${e.message}")
-                setLoadingState(false)
-            } 
+            // First, update the cart to save any quantity changes
+            updateCart(andThenNavigate = true)
         }
     }
 
@@ -132,8 +84,7 @@ class CartFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                delay(400)
-
+                delay(400) // Small delay for UX
                 val cartId = tokenManager.getCartId()
                 if (cartId == -1) {
                     cartAdapter.updateItems(emptyList())
@@ -188,7 +139,7 @@ class CartFragment : Fragment() {
         }.awaitAll()
     }
 
-    private fun updateCart() {
+    private fun updateCart(andThenNavigate: Boolean) {
         val currentItems = cartAdapter.getItems()
         val itemsToKeep = currentItems.filter { it.quantity > 0 }
         val currentTotal = itemsToKeep.sumOf { (it.product_details?.price ?: 0.0) * it.quantity }
@@ -202,21 +153,27 @@ class CartFragment : Fragment() {
         setLoadingState(true)
         lifecycleScope.launch {
             try {
-                delay(500) // Add a delay to prevent rate limiting
+                delay(500) 
                 val updateRequest = UpdateCartProductsRequest(products = itemsToKeep, total = currentTotal)
                 cartService.updateCart(cartId, updateRequest)
-                Toast.makeText(requireContext(), "Carrito actualizado con éxito", Toast.LENGTH_SHORT).show()
+                
+                if (andThenNavigate) {
+                    val action = CartFragmentDirections.actionCartFragmentToPaymentFragment(currentTotal.toFloat())
+                    findNavController().navigate(action)
+                } else {
+                    Toast.makeText(requireContext(), "Carrito actualizado con éxito", Toast.LENGTH_SHORT).show()
+                    loadCart() // Reload to reflect changes
+                }
             } catch (e: Exception) {
                 showError("Error al actualizar el carrito: ${e.message}")
-            } finally {
-                loadCart() // Reload to reflect changes and new state
-            }
+                setLoadingState(false)
+            } 
         }
     }
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBarCart.isVisible = isLoading
-        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading) 
 
         if (isLoading) {
             binding.recyclerViewCart.isVisible = false

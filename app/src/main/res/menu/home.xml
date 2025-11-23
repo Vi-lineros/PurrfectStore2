@@ -2,27 +2,46 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/productFragment"
-        android:icon="@drawable/ic_menu_cart" 
-        android:title="Productos" />
-
-    <item
-        android:id="@+id/cartFragment"
-        android:icon="@drawable/ic_menu_cart"
-        android:title="Carrito" />
-
-    <item
-        android:id="@+id/myOrdersFragment"
-        android:icon="@drawable/ic_menu_cart" 
-        android:title="Mis Pedidos" />
+    <!-- Client Section -->
+    <group android:id="@+id/client_section" android:checkableBehavior="single">
+        <item
+            android:id="@+id/productFragment"
+            android:icon="@drawable/ic_menu_products"
+            android:title="Productos" />
+        <item
+            android:id="@+id/cartFragment"
+            android:icon="@drawable/ic_menu_cart"
+            android:title="Carrito" />
+        <item
+            android:id="@+id/myOrdersFragment"
+            android:icon="@drawable/ic_menu_orders"
+            android:title="Mis Pedidos" />
+    </group>
 
     <!-- Admin Section -->
-    <group android:id="@+id/admin_section" android:visible="false">
+    <group android:id="@+id/admin_section" android:checkableBehavior="single">
+        <item
+            android:id="@+id/productsAdminFragment"
+            android:icon="@drawable/ic_menu_products"
+            android:title="Productos" />
         <item
             android:id="@+id/userOrderList"
-            android:icon="@drawable/ic_menu_cart" 
+            android:icon="@drawable/ic_menu_orders"
             android:title="Pedidos" />
+        <item
+            android:id="@+id/usersListFragment"
+            android:icon="@drawable/ic_menu_users"
+            android:title="Usuarios" />
     </group>
+
+    <!-- Common Section -->
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_menu_profile"
+        android:title="Mi Perfil" />
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_menu_logout"
+        android:title="Cerrar Sesión" />
 
 </menu>

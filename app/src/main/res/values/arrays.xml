@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bank_options">
+        <item>Banco de Crédito e Inversiones (BCI)</item>
+        <item>Banco Santander Chile</item>
+        <item>BancoEstado</item>
+        <item>Banco de Chile</item>
+        <item>Scotiabank Chile</item>
+    </string-array>
+</resources>

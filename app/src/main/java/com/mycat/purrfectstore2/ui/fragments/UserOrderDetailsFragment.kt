@@ -25,6 +25,7 @@ import com.mycat.purrfectstore2.ui.adapter.OrderDetailProductAdapter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -56,6 +57,13 @@ class UserOrderDetailsFragment : Fragment() {
         loadOrderDetails()
     }
 
+    private fun setLoading(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
+        binding.layoutActionButtons.isVisible = !isLoading
+        binding.recyclerViewOrderProducts.isVisible = !isLoading
+        binding.cardViewOrderTotals.isVisible = !isLoading
+    }
+
     private fun setupRecyclerView() {
         productAdapter = OrderDetailProductAdapter(emptyList())
         binding.recyclerViewOrderProducts.apply {
@@ -74,8 +82,10 @@ class UserOrderDetailsFragment : Fragment() {
     }
 
     private fun loadOrderDetails() {
+        setLoading(true)
         lifecycleScope.launch {
             try {
+                delay(500) // Small delay for UX consistency
                 val cart = cartService.getCart(args.orderId)
                 val populatedProducts = fetchProductDetailsForCart(cart.product_id ?: emptyList())
                 productAdapter.updateProducts(populatedProducts)
@@ -86,6 +96,10 @@ class UserOrderDetailsFragment : Fragment() {
                 updateButtonState(cart.status)
             } catch (e: Exception) {
                 Toast.makeText(context, "Error al cargar el pedido: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                if (_binding != null) {
+                    setLoading(false)
+                }
             }
         }
     }
@@ -119,9 +133,11 @@ class UserOrderDetailsFragment : Fragment() {
     }
 
     private fun updateOrderStatus(newStatus: String) {
+        setLoading(true)
         lifecycleScope.launch {
             try {
-                // If approving, update stock first
+                delay(500) // Delay to prevent 429 and improve UX
+
                 if (newStatus == "aprobado") {
                     val cart = cartService.getCart(args.orderId)
                     updateStockForOrder(cart.product_id ?: emptyList())
@@ -133,6 +149,10 @@ class UserOrderDetailsFragment : Fragment() {
 
             } catch (e: Exception) {
                 Toast.makeText(context, "Error al actualizar el estado: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                if (_binding != null) {
+                    setLoading(false)
+                }
             }
         }
     }
