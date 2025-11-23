@@ -66,6 +66,7 @@ CARRITO / ÓRDENES
 - Obtener carrito	GET	/cart/{cart_id}
 - Editar carrito / estado	PATCH	/cart/{cart_id}
 - Eliminar carrito	DELETE	/cart/{cart_id}
+
 (En esta aplicación los carritos funcionan también como órdenes)
 
 Estados utilizados:
