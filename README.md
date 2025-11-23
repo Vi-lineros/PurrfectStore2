@@ -51,32 +51,29 @@ E-commerce: https://x8ki-letl-twmt.n7.xano.io/api:4LX8pHTM
 
 4. Endpoints Utilizados
 AUTH
-Acción	Método	Endpoint
-Login	POST	/auth/login
-Registro	POST	/auth/signup
-Perfil autenticado	GET	/auth/me
+- Login	POST	/auth/login
+- Registro	POST	/auth/signup
+- Perfil autenticado	GET	/auth/me
 PRODUCTOS
-Acción	Método	Endpoint
-Listar productos	GET	/product
-Crear producto	POST	/product
-Obtener producto	GET	/product/{product_id}
-Editar producto	PATCH	/product/{product_id}
-Eliminar producto	DELETE	/product/{product_id}
+- Listar productos	GET	/product
+- Crear producto	POST	/product
+- Obtener producto	GET	/product/{product_id}
+- Editar producto	PATCH	/product/{product_id}
+- Eliminar producto	DELETE	/product/{product_id}
 USUARIOS (Admin)
-Acción	Método	Endpoint
-Listar usuarios	GET	/user
-Crear usuario	POST	/user
-Obtener usuario	GET	/user/{user_id}
-Editar usuario	PATCH	/user/{user_id}
-Eliminar usuario	DELETE	/user/{user_id}
+- Listar usuarios	GET	/user
+- Crear usuario	POST	/user
+- Obtener usuario	GET	/user/{user_id}
+- Editar usuario	PATCH	/user/{user_id}
+- Eliminar usuario	DELETE	/user/{user_id}
 CARRITO / ÓRDENES
-Acción	Método	Endpoint
-Listar carritos	GET	/cart
-Crear carrito	POST	/cart
-Obtener carrito	GET	/cart/{cart_id}
-Editar carrito / estado	PATCH	/cart/{cart_id}
-Eliminar carrito	DELETE	/cart/{cart_id}
-(En esta aplicación los carritos funcionan también como órdenes)
+- Acción	Método	Endpoint
+- Listar carritos	GET	/cart
+- Crear carrito	POST	/cart
+- Obtener carrito	GET	/cart/{cart_id}
+- Editar carrito / estado	PATCH	/cart/{cart_id}
+- Eliminar carrito	DELETE	/cart/{cart_id}
+- (En esta aplicación los carritos funcionan también como órdenes)
 
 Estados utilizados:
 
