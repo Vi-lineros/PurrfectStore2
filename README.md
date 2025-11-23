@@ -129,30 +129,49 @@ Correo: cliente@gmail.com
 Contraseña: cliente123
 
 7. Funcionalidades Implementadas
+
 Cliente
 
 ✔ Buscar y listar productos
+
 ✔ Ver detalles del producto
+
 ✔ Agregar al carrito
+
 ✔ Editar cantidades
+
 ✔ Eliminar ítems del carrito
+
 ✔ Pago simulado
+
 ✔ Solicitar envío (estado: pendiente)
+
 ✔ Ver estado de pedido
+
 ✔ Editar perfil
+
 ✔ Cerrar sesión
 
 Admin
 
 ✔ Crear productos
+
 ✔ Editar productos
+
 ✔ Eliminar productos
+
 ✔ Subir múltiples imágenes
+
 ✔ Listar productos
+
 ✔ Crear / editar / eliminar usuarios
+
 ✔ Bloquear usuarios
+
 ✔ Ver solicitudes de pagos/envíos
+
 ✔ Actualizar estado de la orden (aceptado / rechazado)
+
 ✔ Cerrar sesión
 
 8. Arquitectura General
