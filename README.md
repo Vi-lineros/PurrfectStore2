@@ -50,22 +50,26 @@ Autenticación: https://x8ki-letl-twmt.n7.xano.io/api:8Cd9QvL_
 E-commerce: https://x8ki-letl-twmt.n7.xano.io/api:4LX8pHTM
 
 4. Endpoints Utilizados
+
 AUTH
 - Login	POST	/auth/login
 - Registro	POST	/auth/signup
 - Perfil autenticado	GET	/auth/me
+
 PRODUCTOS
 - Listar productos	GET	/product
 - Crear producto	POST	/product
 - Obtener producto	GET	/product/{product_id}
 - Editar producto	PATCH	/product/{product_id}
 - Eliminar producto	DELETE	/product/{product_id}
+
 USUARIOS (Admin)
 - Listar usuarios	GET	/user
 - Crear usuario	POST	/user
 - Obtener usuario	GET	/user/{user_id}
 - Editar usuario	PATCH	/user/{user_id}
 - Eliminar usuario	DELETE	/user/{user_id}
+
 CARRITO / ÓRDENES
 - Acción	Método	Endpoint
 - Listar carritos	GET	/cart
