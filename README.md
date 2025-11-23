@@ -16,31 +16,20 @@ Admin: CRUD de productos, CRUD de usuarios y aprobación o rechazo de órdenes.
 Incluye autenticación, persistencia de sesión, navegación dinámica según rol y subida de múltiples imágenes por producto.
 
 2. Tecnologías Utilizadas
-Frontend (Android)
 
-Kotlin
-
-XML Layouts
-
-ViewBinding
-
-DrawerActivity + Fragments
-
-RecyclerView
-
-SharedPreferences
-
-Retrofit + Gson
-
-Validaciones y manejo de errores
-
-Ícono personalizado
-
-Backend
-
-Xano (REST + Files)
-
-Almacenamiento de imágenes en el módulo Files de Xano
+- Frontend (Android)
+- Kotlin
+- XML Layouts
+- ViewBinding
+- DrawerActivity + Fragments
+- RecyclerView
+- SharedPreferences
+- Retrofit + Gson
+- Validaciones y manejo de errores
+- Ícono personalizado
+- Backend
+- Xano (REST + Files)
+- Almacenamiento de imágenes en el módulo Files de Xano
 
 3. Backend (Xano)
 URLs Base
@@ -80,53 +69,39 @@ CARRITO / ÓRDENES
 - (En esta aplicación los carritos funcionan también como órdenes)
 
 Estados utilizados:
-
-Cliente: en proceso, pendiente
-
-Admin: aceptado, rechazado
+- Cliente: en proceso, pendiente
+- Admin: aceptado, rechazado
 
 IMÁGENES
-Acción	Método	Endpoint
-Subir archivo	POST	/upload/image
-
+- Subir archivo	POST	/upload/image
 Las imágenes quedan almacenadas en Xano (Files).
 
 5. Instalación y Configuración del Proyecto
 Requisitos
 
-Android Studio Ladybug o superior
-
-SDK 24+
-
-Emulador o dispositivo físico Android
+- Android Studio Ladybug o superior
+- SDK 24+
+- Emulador o dispositivo físico Android
 
 Pasos para compilar
 
-Clonar el repositorio:
-
+- Clonar el repositorio:
 git clone https://github.com/Vi-lineros/PurrfectStore2.git
 
-
-Abrir en Android Studio.
-
-Esperar a que Gradle sincronice.
-
-No requiere claves ni archivos secretos.
-
-Ejecutar en emulador o dispositivo físico.
+- Abrir en Android Studio.
+- Esperar a que Gradle sincronice.
+- No requiere claves ni archivos secretos.
+- Ejecutar en emulador o dispositivo físico.
 
 6. Credenciales de Prueba
+
 Administrador
-
-Correo: admin@gmail.com
-
-Contraseña: admin123
+- Correo: admin@gmail.com
+- Contraseña: admin123
 
 Cliente
-
-Correo: cliente@gmail.com
-
-Contraseña: cliente123
+- Correo: cliente@gmail.com
+- Contraseña: cliente123
 
 7. Funcionalidades Implementadas
 
@@ -178,31 +153,23 @@ Admin
 
 El proyecto utiliza:
 
-DrawerActivity como contenedor principal
-
-Fragments para las pantallas
-
-Managers para comunicación con Retrofit
-
-SharedPreferences para token, rol y estado de sesión
-
-RecyclerView para productos, usuarios y carritos/órdenes
+- DrawerActivity como contenedor principal
+- Fragments para las pantallas
+- Managers para comunicación con Retrofit
+- SharedPreferences para token, rol y estado de sesión
+- RecyclerView para productos, usuarios y carritos/órdenes
 
 9. Funcionamiento de la Sesión
 
-Al iniciar sesión se guarda el token y el rol.
-
-Desde el Splash se redirige automáticamente según el rol.
-
-El logout limpia completamente las SharedPreferences.
+- Al iniciar sesión se guarda el token y el rol.
+- Desde el Splash se redirige automáticamente según el rol.
+- El logout limpia completamente las SharedPreferences.
 
 10. Subida de Imágenes
 
-Envío de archivos por multipart/form-data.
-
-Xano retorna la URL pública.
-
-La app guarda la URL asociada a cada producto.
+- Envío de archivos por multipart/form-data.
+- Xano retorna la URL pública.
+- La app guarda la URL asociada a cada producto.
 
 11. APK
 
