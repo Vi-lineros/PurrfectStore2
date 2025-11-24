@@ -24,7 +24,7 @@ class AddUsersFragment : Fragment() {
     private var _binding: FragmentAddUsersBinding? = null
     private val binding get() = _binding!!
     private lateinit var userService: UserService
-    private lateinit var cartService: CartService // Service to create the cart
+    private lateinit var cartService: CartService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +32,7 @@ class AddUsersFragment : Fragment() {
     ): View {
         _binding = FragmentAddUsersBinding.inflate(inflater, container, false)
         userService = RetrofitClient.createUserService(requireContext())
-        cartService = RetrofitClient.createCartService(requireContext()) // Initialize CartService
+        cartService = RetrofitClient.createCartService(requireContext())
         return binding.root
     }
 
@@ -75,10 +75,7 @@ class AddUsersFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Create the user first
                 val newUser = userService.createUser(userRequest)
-                
-                // Immediately create a cart for the newly created user
                 val createCartRequest = CreateCartRequest(user_id = newUser.id)
                 cartService.createCart(createCartRequest)
 

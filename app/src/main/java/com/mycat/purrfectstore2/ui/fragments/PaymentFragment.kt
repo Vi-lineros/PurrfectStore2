@@ -76,8 +76,6 @@ class PaymentFragment : Fragment() {
 
                 val cart = cartService.getCart(cartId)
                 val cartProducts = fetchProductDetailsForCart(cart.product_id ?: emptyList())
-
-                // Build summary string
                 val summaryText = StringBuilder()
                 val itemsToShow = cartProducts.take(2)
                 itemsToShow.forEach {
@@ -102,9 +100,7 @@ class PaymentFragment : Fragment() {
                 try {
                     val productDetails = productService.getProductId(cartProduct.product_id)
                     cartProduct.product_details = productDetails
-                } catch (e: Exception) {
-                    // Log error if needed, but don't crash
-                }
+                } catch (e: Exception) {}
                 cartProduct
             }
         }.awaitAll()
@@ -180,14 +176,13 @@ class PaymentFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val user = authService.getMe()
-                // Essential check for shipping address
                 if (user.shippingAddress.isNullOrBlank()) {
                     Toast.makeText(context, "¡Configura tu direccion de envio!", Toast.LENGTH_LONG).show()
                     setLoading(false)
                     return@launch
                 }
 
-                delay(1500) // Simulate payment processing
+                delay(1500)
                 val currentCartId = tokenManager.getCartId()
                 if (currentCartId == -1) throw IllegalStateException("Carrito actual no válido")
 

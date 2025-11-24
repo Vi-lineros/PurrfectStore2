@@ -38,7 +38,7 @@ class CartAdapter(
 
     inner class CartViewHolder(private val binding: CartItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         
-        private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US) // Or your desired locale
+        private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
         fun bind(cartProduct: CartProduct) {
             binding.textViewCartItemQuantity.text = cartProduct.quantity.toString()

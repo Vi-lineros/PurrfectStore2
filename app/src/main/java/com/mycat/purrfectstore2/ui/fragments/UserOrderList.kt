@@ -72,20 +72,16 @@ class UserOrderList : Fragment() {
         setLoadingState(true)
         lifecycleScope.launch {
             try {
-                // Fetch all carts and all users in parallel
                 val cartsDeferred = async { cartService.getCarritos() }
                 val usersDeferred = async { userService.getUsers() }
 
                 val allCarts = cartsDeferred.await()
                 val allUsers = usersDeferred.await()
 
-                // Filter out carts with "en proceso" status
                 val filteredCarts = allCarts.filter { it.status.lowercase(Locale.getDefault()) != "en proceso" }
 
-                // Create a map of user IDs to usernames for quick lookup
                 val userMap = allUsers.associateBy(User::id, User::username)
 
-                // Combine carts with usernames
                 val ordersWithUsers = filteredCarts.mapNotNull { cart ->
                     userMap[cart.user_id]?.let { username ->
                         OrderWithUser(cart, username)
@@ -106,7 +102,7 @@ class UserOrderList : Fragment() {
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBarUserOrders.isVisible = isLoading
-        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
         binding.recyclerViewUserOrders.isVisible = !isLoading
         if (isLoading) {
              binding.textViewNoOrders.isVisible = false

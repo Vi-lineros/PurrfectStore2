@@ -36,7 +36,6 @@ data class User(
     @SerializedName("status")
     var status: String? = null,
 
-    // The 'cart' field is now a list of carts, as configured in Xano.
     @SerializedName("cart")
     val cart: List<Cart>? 
 )

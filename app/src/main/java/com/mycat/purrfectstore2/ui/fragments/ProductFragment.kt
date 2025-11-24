@@ -108,7 +108,7 @@ class ProductFragment : Fragment() {
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBar.isVisible = isLoading
-        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
         binding.recyclerViewProducts.isVisible = !isLoading
     }
 

@@ -111,9 +111,7 @@ class RegisterActivity : AppCompatActivity() {
                 val errorMessage = e.message ?: "Error"
                 Log.e("RegisterActivity", "Error en el registro: $errorMessage")
                 Toast.makeText(this@RegisterActivity, "Error en el registro: $errorMessage", Toast.LENGTH_LONG).show()
-            } finally {
-                // Re-enable button only if validation is still met, handled by TextWatcher
-            }
+            } finally {}
         }
     }
 }

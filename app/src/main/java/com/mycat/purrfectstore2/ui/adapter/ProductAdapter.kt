@@ -1,6 +1,5 @@
 package com.mycat.purrfectstore2.ui.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,7 +63,7 @@ class ProductAdapter(
                 binding.root.alpha = 1.0f
             } else {
                 binding.textViewProductStock.text = "Sin stock"
-                binding.root.alpha = 0.6f // Fade out the item
+                binding.root.alpha = 0.6f
             }
 
             if (product.images.isNotEmpty()) {
@@ -80,7 +79,7 @@ class ProductAdapter(
             binding.selectionOverlay.visibility = if (selectedItems.contains(product.id)) View.VISIBLE else View.GONE
 
             binding.root.setOnClickListener {
-                onProductClicked(product) // Let the fragment decide what to do
+                onProductClicked(product)
             }
 
             binding.root.setOnLongClickListener {

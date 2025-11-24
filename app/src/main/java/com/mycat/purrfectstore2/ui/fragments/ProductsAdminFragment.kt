@@ -132,7 +132,7 @@ class ProductsAdminFragment : Fragment() {
         val itemsToDelete = productAdapter.selectedItems.toList()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            setLoadingState(true) // Lock UI for deletion
+            setLoadingState(true)
             try {
                 itemsToDelete.forEach { productId ->
                     productService.deleteProduct(productId)
@@ -143,7 +143,7 @@ class ProductsAdminFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
-                setLoadingState(false) // Unlock UI
+                setLoadingState(false)
             }
         }
     }

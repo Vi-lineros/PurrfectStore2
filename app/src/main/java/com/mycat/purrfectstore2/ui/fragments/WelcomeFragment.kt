@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.FragmentWelcomeBinding
 import com.mycat.purrfectstore2.ui.HomeActivity
@@ -34,7 +33,7 @@ class WelcomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(1000) // Wait for 1 second
+            delay(1000)
             navigateToNextScreen()
         }
     }

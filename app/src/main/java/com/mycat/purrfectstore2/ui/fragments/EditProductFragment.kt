@@ -94,7 +94,7 @@ class EditProductFragment : Fragment() {
                 binding.editTextPrice.setText(product.price.toString())
                 binding.editTextQuantity.setText(product.stock.toString())
 
-                imageItems.addAll(product.images) // Store the whole ProductImage object
+                imageItems.addAll(product.images)
                 imageAdapter.notifyDataSetChanged()
                 binding.recyclerViewImagePreview.visibility = if (imageItems.isNotEmpty()) View.VISIBLE else View.GONE
 

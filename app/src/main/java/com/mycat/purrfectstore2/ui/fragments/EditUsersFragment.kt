@@ -82,7 +82,6 @@ class EditUsersFragment : Fragment() {
         val newUsername = binding.textInputUsername.editText?.text.toString().trim()
         val newEmail = binding.textInputEmail.editText?.text.toString().trim()
 
-        // 1. Mandatory fields validation
         if (newUsername.isEmpty() || newEmail.isEmpty()) {
             Toast.makeText(requireContext(), "Es obligatorio que tenga nombre y el email", Toast.LENGTH_SHORT).show()
             return
@@ -92,15 +91,13 @@ class EditUsersFragment : Fragment() {
             return
         }
 
-        // 2. Build map of changed data, but always include name and email
         val updateData = mutableMapOf<String, Any>()
         var hasChanges = false
 
-        // Always add name and email
         updateData["name"] = newUsername
         updateData["email"] = newEmail
 
-        // Add other fields only if they have changed
+
         val newPassword = binding.textInputPassword.editText?.text.toString().trim()
         if (newPassword.isNotEmpty()) {
             updateData["password"] = newPassword
@@ -141,13 +138,11 @@ class EditUsersFragment : Fragment() {
              hasChanges = true
         }
 
-        // 3. Check for effective changes
         if (!hasChanges) {
             Toast.makeText(requireContext(), "No hay cambios para guardar", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // 4. Send the update to the API
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val updatedUser = userService.updateUser(originalUser.id, updateData)

@@ -2,7 +2,6 @@ package com.mycat.purrfectstore2.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.mycat.purrfectstore2.R
@@ -63,7 +62,7 @@ class MyOrdersAdapter(private var orders: List<Cart>) : RecyclerView.Adapter<MyO
                 "aprobado" -> R.drawable.status_approved_background
                 "rechazado" -> R.drawable.status_rejected_background
                 "pendiente" -> R.drawable.status_pending_background
-                else -> R.drawable.bg_status_active // A default background
+                else -> R.drawable.bg_status_active
             }
             binding.textViewOrderStatus.setBackgroundResource(statusBackground)
         }

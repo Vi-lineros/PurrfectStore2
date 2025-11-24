@@ -79,7 +79,6 @@
             app:argType="integer" />
     </fragment>
 
-    <!-- User Management Fragments -->
     <fragment
         android:id="@+id/usersListFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.UsersListFragment"
@@ -121,7 +120,6 @@
             app:destination="@id/paymentFragment" />
     </fragment>
 
-    <!-- Order Fragments -->
     <fragment
         android:id="@+id/myOrdersFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.MyOrdersFragment"
@@ -141,7 +139,6 @@
             app:argType="integer" />
     </fragment>
 
-    <!-- Admin Order Fragments -->
     <fragment
         android:id="@+id/userOrderList"
         android:name="com.mycat.purrfectstore2.ui.fragments.UserOrderList"
@@ -175,8 +172,7 @@
             android:name="quantity"
             app:argType="integer" />
     </fragment>
-    
-    <!-- Payment Fragment -->
+
     <fragment
         android:id="@+id/paymentFragment"
         android:name="com.mycat.purrfectstore2.ui.fragments.PaymentFragment"

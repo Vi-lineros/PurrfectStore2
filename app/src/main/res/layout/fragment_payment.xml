@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Order Summary -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardOrderSummary"
             android:layout_width="0dp"
@@ -62,7 +61,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Shipping Address -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardShippingAddress"
             android:layout_width="0dp"
@@ -127,7 +125,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Payment Method -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPaymentMethod"
             android:layout_width="0dp"

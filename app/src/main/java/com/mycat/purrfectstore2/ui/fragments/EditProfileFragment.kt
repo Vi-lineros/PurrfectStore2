@@ -34,9 +34,7 @@ class EditProfileFragment : Fragment() {
     ): View {
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         tokenManager = TokenManager(requireContext())
-        // Use the saved token to create a private (authenticated) auth service
         authService = RetrofitClient.createAuthService(requireContext(), true, tokenManager.getToken())
-        // The user service is needed to update the user
         userService = RetrofitClient.createUserService(requireContext())
         return binding.root
     }
@@ -50,7 +48,6 @@ class EditProfileFragment : Fragment() {
     private fun loadUserProfile() {
         lifecycleScope.launch {
             try {
-                // Use the /auth/me endpoint to get the user's own data
                 val userProfile = authService.getMe()
                 currentUser = userProfile
                 populateUI(userProfile)
@@ -93,8 +90,6 @@ class EditProfileFragment : Fragment() {
                 updatedData["last_name"] = binding.textInputLastNameEdit.text.toString()
                 updatedData["shipping_address"] = binding.textInputAddressEdit.text.toString()
                 updatedData["phone"] = binding.textInputPhoneEdit.text.toString()
-
-                // Password update logic is now completely removed
 
                 userService.updateUser(userId, updatedData)
                 Toast.makeText(context, "Perfil actualizado con éxito", Toast.LENGTH_SHORT).show()

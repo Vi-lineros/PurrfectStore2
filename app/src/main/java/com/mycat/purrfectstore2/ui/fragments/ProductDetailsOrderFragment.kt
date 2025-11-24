@@ -53,7 +53,7 @@ class ProductDetailsOrderFragment : Fragment() {
         setLoadingState(true)
         lifecycleScope.launch {
             try {
-                delay(1500) // Added delay
+                delay(1500)
                 val product = productService.getProductId(args.productId)
                 val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
@@ -109,7 +109,6 @@ class ProductDetailsOrderFragment : Fragment() {
         prevButton.setOnClickListener { viewPager.currentItem -= 1 }
         nextButton.setOnClickListener { viewPager.currentItem += 1 }
 
-        // Set initial visibility
         prevButton.visibility = View.GONE
         nextButton.visibility = if (imageCount > 1) View.VISIBLE else View.GONE
     }

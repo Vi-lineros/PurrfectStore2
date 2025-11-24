@@ -85,7 +85,7 @@ class UserOrderDetailsFragment : Fragment() {
         setLoading(true)
         lifecycleScope.launch {
             try {
-                delay(500) // Small delay for UX consistency
+                delay(500)
                 val cart = cartService.getCart(args.orderId)
                 val populatedProducts = fetchProductDetailsForCart(cart.product_id ?: emptyList())
                 productAdapter.updateProducts(populatedProducts)
@@ -109,9 +109,7 @@ class UserOrderDetailsFragment : Fragment() {
             async {
                 try {
                     cartProduct.product_details = productService.getProductId(cartProduct.product_id)
-                } catch (e: Exception) {
-                    // Product might not be available, handle gracefully
-                }
+                } catch (e: Exception) {}
                 cartProduct
             }
         }.awaitAll()
@@ -136,7 +134,7 @@ class UserOrderDetailsFragment : Fragment() {
         setLoading(true)
         lifecycleScope.launch {
             try {
-                delay(500) // Delay to prevent 429 and improve UX
+                delay(500)
 
                 if (newStatus == "aprobado") {
                     val cart = cartService.getCart(args.orderId)
@@ -168,9 +166,7 @@ class UserOrderDetailsFragment : Fragment() {
 
                     productService.updateProduct(product.id, updateRequest)
 
-                } catch (e: Exception) {
-                    // Log or handle error for individual product stock update
-                }
+                } catch (e: Exception) {}
             }
         }
     }

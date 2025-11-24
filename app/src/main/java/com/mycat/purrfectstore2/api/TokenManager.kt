@@ -14,11 +14,10 @@ class TokenManager(context: Context) {
             putString(KEY_USER_NAME, userName)
             putString(KEY_USER_EMAIL, userEmail)
             putString(KEY_USER_ROLE, userRole)
-            apply() // Use apply() for asynchronous saving
+            apply()
         }
     }
 
-    // Saves the user's cart ID
     fun saveCartId(cartId: Int) {
         prefs.edit().apply {
             putInt(KEY_CART_ID, cartId)
@@ -30,7 +29,6 @@ class TokenManager(context: Context) {
 
     fun getUserId(): Int = prefs.getInt(KEY_USER_ID, -1)
 
-    // Retrieves the stored cart ID
     fun getCartId(): Int = prefs.getInt(KEY_CART_ID, -1)
 
     fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
@@ -41,7 +39,6 @@ class TokenManager(context: Context) {
 
     fun isLoggedIn(): Boolean = getToken() != null
 
-    // Clears all session data, including the new cart ID
     fun clear() {
         prefs.edit().clear().apply()
     }
@@ -50,7 +47,7 @@ class TokenManager(context: Context) {
         private const val PREFS_NAME = "session"
         private const val KEY_TOKEN = "jwt_token"
         private const val KEY_USER_ID = "user_id"
-        private const val KEY_CART_ID = "cart_id" // New key for the cart ID
+        private const val KEY_CART_ID = "cart_id"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_USER_ROLE = "user_role"

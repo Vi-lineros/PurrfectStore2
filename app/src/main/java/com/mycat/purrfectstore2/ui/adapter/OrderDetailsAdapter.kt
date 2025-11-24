@@ -47,8 +47,8 @@ class OrderDetailsAdapter(private var products: List<CartProduct>) : RecyclerVie
                 val imageUrl = productDetails.images.firstOrNull()?.url
                 Glide.with(itemView.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.fresa) // Default placeholder
-                    .error(R.drawable.fresa) // Error placeholder
+                    .placeholder(R.drawable.fresa)
+                    .error(R.drawable.fresa)
                     .into(binding.imageViewProduct)
             } else {
                 binding.textViewProductName.text = "Cargando..."

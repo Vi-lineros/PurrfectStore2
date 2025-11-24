@@ -128,7 +128,7 @@ class UsersListFragment : Fragment() {
     private fun updateUserStatus(user: User, newStatus: String, successMessage: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                setLoadingState(true) // Lock UI
+                setLoadingState(true)
                 val fullUserData = mutableMapOf<String, @JvmSuppressWildcards Any>()
                 fullUserData["name"] = user.username
                 fullUserData["email"] = user.email
@@ -145,7 +145,7 @@ class UsersListFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al actualizar estado: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
-                setLoadingState(false) // Unlock UI
+                setLoadingState(false)
             }
         }
     }
@@ -191,7 +191,7 @@ class UsersListFragment : Fragment() {
         val deleteWord = if (itemsToDelete.size == 1) "eliminado" else "eliminados"
 
         viewLifecycleOwner.lifecycleScope.launch {
-            setLoadingState(true) // Lock UI
+            setLoadingState(true)
             try {
                 itemsToDelete.forEach { userId ->
                     userService.deleteUser(userId)
@@ -202,7 +202,7 @@ class UsersListFragment : Fragment() {
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
-                setLoadingState(false) // Unlock UI
+                setLoadingState(false)
             }
         }
     }

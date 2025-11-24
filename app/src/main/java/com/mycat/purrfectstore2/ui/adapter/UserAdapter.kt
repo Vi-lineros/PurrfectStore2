@@ -13,7 +13,7 @@ class UserAdapter(
     private val onUserClicked: (User) -> Unit,
     private val onUserLongClicked: (User) -> Unit,
     private val onSelectionChanged: (Int) -> Unit,
-    private val onStatusClicked: (User) -> Unit // New communication channel for status clicks
+    private val onStatusClicked: (User) -> Unit
 ) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     private var users: List<User> = emptyList()
@@ -63,7 +63,6 @@ class UserAdapter(
                 .placeholder(R.drawable.ic_menu_profile)
                 .into(binding.userImage)
 
-            // Update status text and appearance
             when (user.status?.lowercase()) {
                 "active", "normal" -> {
                     binding.userStatus.text = "Activo"
@@ -79,12 +78,10 @@ class UserAdapter(
                 }
             }
 
-            // Set the new listener on the status view
             binding.userStatus.setOnClickListener {
                 onStatusClicked(user)
             }
 
-            // Visual feedback for selection
             val isSelected = selectedItems.contains(user.id)
             if (isSelected) {
                 binding.root.setCardBackgroundColor(Color.argb(40, 255, 0, 0))

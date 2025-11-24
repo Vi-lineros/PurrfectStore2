@@ -62,7 +62,7 @@ class MyOrdersFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                delay(1500) // Set delay to 1.5 seconds
+                delay(1500)
                 val userProfile = authService.getMe()
                 
                 val completedOrders = userProfile.cart?.filter { it.status != "en proceso" } ?: emptyList()
@@ -85,9 +85,8 @@ class MyOrdersFragment : Fragment() {
 
     private fun setLoadingState(isLoading: Boolean) {
         binding.progressBarOrders.isVisible = isLoading
-        (activity as? HomeActivity)?.setDrawerLocked(isLoading) // Lock/Unlock Drawer
+        (activity as? HomeActivity)?.setDrawerLocked(isLoading)
 
-        // Hide content while loading
         if (isLoading) {
             binding.recyclerViewOrders.isVisible = false
             binding.textViewNoOrders.isVisible = false

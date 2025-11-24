@@ -1,16 +1,12 @@
 package com.mycat.purrfectstore2.ui
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -19,12 +15,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.mycat.purrfectstore2.R
-import com.mycat.purrfectstore2.api.RetrofitClient
 import com.mycat.purrfectstore2.api.TokenManager
 import com.mycat.purrfectstore2.databinding.ActivityHomeBinding
 import com.mycat.purrfectstore2.ui.fragments.ProductsAdminFragment
 import com.mycat.purrfectstore2.ui.fragments.UsersListFragment
-import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -51,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.welcomeFragment, // Added welcome fragment to top-level
+                R.id.welcomeFragment,
                 R.id.productFragment, R.id.profileFragment, R.id.cartFragment,
                 R.id.myOrdersFragment, R.id.userOrderList,
                 R.id.usersListFragment, R.id.productsAdminFragment
@@ -90,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
     fun showCancelButton(show: Boolean) {
         cancelButton.visibility = if (show) View.VISIBLE else View.GONE
         supportActionBar?.setDisplayHomeAsUpEnabled(!show)
-        setDrawerLocked(show) // Re-use the drawer locking logic
+        setDrawerLocked(show)
     }
 
     private fun setupDrawerHeader() {

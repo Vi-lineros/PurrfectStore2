@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mycat.purrfectstore2.R
 import com.mycat.purrfectstore2.api.CartService
 import com.mycat.purrfectstore2.api.ProductService
 import com.mycat.purrfectstore2.api.RetrofitClient
@@ -73,7 +72,6 @@ class CartFragment : Fragment() {
             updateCart(andThenNavigate = false)
         }
         binding.buttonCheckout.setOnClickListener {
-            // First, update the cart to save any quantity changes
             updateCart(andThenNavigate = true)
         }
     }
@@ -84,7 +82,7 @@ class CartFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                delay(400) // Small delay for UX
+                delay(400)
                 val cartId = tokenManager.getCartId()
                 if (cartId == -1) {
                     cartAdapter.updateItems(emptyList())
@@ -131,9 +129,7 @@ class CartFragment : Fragment() {
                 try {
                     val productDetails = productService.getProductId(cartProduct.product_id)
                     cartProduct.product_details = productDetails
-                } catch (e: Exception) {
-                   // Log error if needed, but don't crash
-                }
+                } catch (e: Exception) {}
                 cartProduct
             }
         }.awaitAll()
@@ -162,7 +158,7 @@ class CartFragment : Fragment() {
                     findNavController().navigate(action)
                 } else {
                     Toast.makeText(requireContext(), "Carrito actualizado con éxito", Toast.LENGTH_SHORT).show()
-                    loadCart() // Reload to reflect changes
+                    loadCart()
                 }
             } catch (e: Exception) {
                 showError("Error al actualizar el carrito: ${e.message}")

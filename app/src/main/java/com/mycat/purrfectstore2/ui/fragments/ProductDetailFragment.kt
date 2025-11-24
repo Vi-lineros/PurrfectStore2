@@ -110,9 +110,7 @@ class ProductDetailFragment : Fragment() {
                 if (cartProduct.product_details == null) {
                     try {
                         cartProduct.product_details = productService.getProductId(cartProduct.product_id)
-                    } catch (e: Exception) {
-                        // Could not fetch details, it won't be part of total calculation
-                    }
+                    } catch (e: Exception) {}
                 }
                 cartProduct
             }
@@ -126,7 +124,7 @@ class ProductDetailFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
-                    delay(1500) // Add a delay to prevent rate limiting
+                    delay(1500)
                     val cartId = tokenManager.getCartId()
                     val stock = currentProduct?.stock ?: 0
                     if (cartId == -1) throw IllegalStateException("Sesión o carrito no válidos.")
@@ -210,8 +208,6 @@ class ProductDetailFragment : Fragment() {
 
         prevButton.setOnClickListener { viewPager.currentItem -= 1 }
         nextButton.setOnClickListener { viewPager.currentItem += 1 }
-
-        // Set initial visibility
         prevButton.visibility = View.GONE
         nextButton.visibility = if (imageCount > 1) View.VISIBLE else View.GONE
     }

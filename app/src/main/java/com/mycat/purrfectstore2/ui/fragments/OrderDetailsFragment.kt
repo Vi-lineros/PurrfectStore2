@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -75,8 +74,7 @@ class OrderDetailsFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                delay(1500) // Set delay to 1.5 seconds
-                // Fetch order and user details concurrently
+                delay(1500)
                 val orderDeferred = async { cartService.getCart(orderId) }
                 val userDeferred = async { authService.getMe() }
                 
@@ -153,9 +151,7 @@ class OrderDetailsFragment : Fragment() {
                 try {
                     val productDetails = productService.getProductId(productItem.product_id)
                     productItem.product_details = productDetails
-                } catch (e: Exception) {
-                    // Log or handle error for a single product fetch
-                }
+                } catch (e: Exception) {}
                 productItem
             }
         }.awaitAll()
