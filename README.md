@@ -1,182 +1,285 @@
-PurrfectStore — App Android (Kotlin + XML)
+PurrfectStore — Android App (Kotlin + XML + Xano)
 
-E-commerce móvil con roles (Cliente / Admin), sesión persistente y gestión de productos, usuarios y órdenes.
-Proyecto final para Programación de Aplicaciones Móviles (Duoc UC).
+Aplicación Android nativa que consume un backend de Xano para ofrecer un catálogo de productos, autenticación persistente con roles, carrito de compras, flujo de pago simulado y módulo administrativo para gestión de productos, usuarios y órdenes.
 
-1. Descripción General
+Características principales
+Autenticación y Sesión
 
-PurrfectStore es una aplicación Android desarrollada en Kotlin usando layouts XML y consumiendo un backend REST creado en Xano.
+Login y registro mediante correo y contraseña, consumo de /auth/login y /auth/signup.
 
-La app implementa dos roles principales:
+Persistencia del token, ID de usuario y rol con SharedPreferences (TokenManager).
 
-Cliente: catálogo, carrito, pago simulado, solicitud de envío y edición de perfil.
+Detección automática de sesión activa desde MainActivity.
 
-Admin: CRUD de productos, CRUD de usuarios y aprobación o rechazo de órdenes.
+Redirección dinámica por rol a HomeActivity (Cliente o Admin).
 
-Incluye autenticación, persistencia de sesión, navegación dinámica según rol y subida de múltiples imágenes por producto.
+Cierre de sesión seguro limpiando preferencias.
 
-2. Tecnologías Utilizadas
+Catálogo y Detalle de Productos
 
-- Frontend (Android)
-- Kotlin
-- XML Layouts
-- ViewBinding
-- DrawerActivity + Fragments
-- RecyclerView
-- SharedPreferences
-- Retrofit + Gson
-- Validaciones y manejo de errores
-- Ícono personalizado
-- Backend
-- Xano (REST + Files)
-- Almacenamiento de imágenes en el módulo Files de Xano
+Listado dinámico con RecyclerView y ProductAdapter.
 
-3. Backend (Xano)
+Vista cliente y vista administrador diferenciadas con layouts y acciones distintas.
+
+Búsqueda de productos según API de Xano.
+
+Vista de detalle (fragment_product_details.xml) con información completa del producto y carrusel de imágenes con ImageSlideAdapter.
+
+Carrito y Pago Simulado
+
+Carrito gestionado desde el fragmento fragment_cart.xml usando CartAdapter.
+
+Edición de cantidades, eliminación de ítems y subtotal dinámico.
+
+Pago simulado que crea un registro de orden en el backend (/cart).
+
+Flujo de confirmación de pago, cambio de estado y solicitud de envío.
+
+Órdenes (Cliente y Admin)
+
+Cliente: visualización de historial en MyOrdersAdapter (fragment_my_orders.xml).
+
+Cliente: detalle de orden en OrderDetailsProductAdapter y OrderDetailsAdapter.
+
+Admin: vista de órdenes pendientes, aceptadas y rechazadas (fragment_order_details.xml).
+
+Admin: actualización de estado usando PATCH a /cart/{id} (aceptado / rechazado).
+
+Gestión de Productos (Admin)
+
+CRUD completo usando los endpoints /product y /upload/image.
+
+Agregar productos con múltiples imágenes usando ImagePreviewAdapter.
+
+Edición y eliminación con validaciones.
+
+Vista exclusiva de administrador (fragment_products_admin.xml).
+
+Gestión de Usuarios (Admin)
+
+Listado completo con UserAdapter (fragment_users_list.xml).
+
+Crear y editar usuarios (fragment_add_users.xml, fragment_edit_users.xml).
+
+Bloquear / desbloquear usuarios mediante el campo active.
+
+Detalle de cada usuario y sus órdenes (fragment_user_order_list.xml y UserOrderListAdapter).
+
+Navegación
+
+Implementada mediante DrawerActivity (HomeActivity) con menús dinámicos según rol.
+
+Fragments independientes organizados por contexto (cliente / admin).
+
+AppBar y Drawer actualizados según navegación.
+
+Tecnologías y versiones
+Android
+
+Kotlin (1.9+)
+
+compileSdk 34
+
+targetSdk 34
+
+minSdk 24
+
+viewBinding habilitado
+
+AndroidX y UI
+
+RecyclerView
+
+Navigation por Drawer
+
+Material Components
+
+ViewPager2 (carrusel de imágenes)
+
+Snackbar / Toast para feedback
+
+Networking
+
+Retrofit + Gson converter
+
+OkHttp para peticiones HTTP
+
+TokenManager para adjuntar Authorization: Bearer <token>
+
+Upload de imágenes en multipart usando /upload/image
+
+Imágenes
+
+Uso de URLs devueltas por Xano Files
+
+Múltiples imágenes por producto
+
+ImageSlideAdapter e ImagePreviewAdapter
+
+Arquitectura y flujo
+Capas principales
+Activities
+Activity	Función
+MainActivity	Verifica sesión y redirige por rol
+HomeActivity	Activity principal con Drawer y fragmentos dinámicos
+RegisterActivity	Registro de nuevos usuarios
+Fragments (Cliente)
+
+fragment_product.xml
+
+fragment_product_details.xml
+
+fragment_cart.xml
+
+fragment_payment.xml
+
+fragment_my_orders.xml
+
+fragment_order_details.xml
+
+fragment_profile.xml
+
+fragment_edit_profile.xml
+
+Fragments (Admin)
+
+fragment_products_admin.xml
+
+fragment_add_product.xml
+
+fragment_edit_product.xml
+
+fragment_users_list.xml
+
+fragment_add_users.xml
+
+fragment_edit_users.xml
+
+fragment_user_order_list.xml
+
+fragment_user_order_details.xml
+
+fragment_product_details_order.xml
+
+Adapters
+
+ProductAdapter
+
+CartAdapter
+
+ImagePreviewAdapter
+
+ImageSlideAdapter
+
+MyOrdersAdapter
+
+OrderDetailsAdapter
+
+OrderDetailsProductAdapter
+
+UserAdapter
+
+UserOrderListAdapter
+
+Manejo de Sesión
+
+TokenManager.kt
+
+Guarda: token, userId, userRole
+
+Expone helpers: saveToken(), getToken(), isLoggedIn()
+
+Usado en Activities y Retrofit
+
+Redistribución del rol
+
+Login
+
+TokenManager guarda token y rol
+
+MainActivity:
+
+Si token existe → /auth/me
+
+Si válidos → abrir HomeActivity
+
+Si admin → menu admin
+
+Si cliente → menu cliente
+
+Backend Xano
 URLs Base
 
-Autenticación: https://x8ki-letl-twmt.n7.xano.io/api:8Cd9QvL_
+Auth: https://x8ki-letl-twmt.n7.xano.io/api:8Cd9QvL_
 
 E-commerce: https://x8ki-letl-twmt.n7.xano.io/api:4LX8pHTM
 
-4. Endpoints Utilizados
+Endpoints
 
-AUTH
-- Login	POST	/auth/login
-- Registro	POST	/auth/signup
-- Perfil autenticado	GET	/auth/me
+Auth: /auth/login, /auth/signup, /auth/me
+Productos: /product, /product/{id}
+Usuarios: /user, /user/{id}
+Órdenes: /cart, /cart/{id}
+Imágenes: /upload/image
 
-PRODUCTOS
-- Listar productos	GET	/product
-- Crear producto	POST	/product
-- Obtener producto	GET	/product/{product_id}
-- Editar producto	PATCH	/product/{product_id}
-- Eliminar producto	DELETE	/product/{product_id}
+Estados de orden
 
-USUARIOS (Admin)
-- Listar usuarios	GET	/user
-- Crear usuario	POST	/user
-- Obtener usuario	GET	/user/{user_id}
-- Editar usuario	PATCH	/user/{user_id}
-- Eliminar usuario	DELETE	/user/{user_id}
+Cliente: pendiente
 
-CARRITO / ÓRDENES
-- Acción	Método	Endpoint
-- Listar carritos	GET	/cart
-- Crear carrito	POST	/cart
-- Obtener carrito	GET	/cart/{cart_id}
-- Editar carrito / estado	PATCH	/cart/{cart_id}
-- Eliminar carrito	DELETE	/cart/{cart_id}
+Admin: aceptado, rechazado
 
-(En esta aplicación los carritos funcionan también como órdenes)
+com.mycat.purrfectstore2/
+├─ app/
+│  ├─ src/main/
+│  │  ├─ java/com/mycat/purrfectstore2/
+│  │  │  ├─ api/        # Retrofit, servicios, interceptores y lógica de red
+│  │  │  ├─ model/      # Modelos y DTOs (Auth, Productos, Carrito, Usuarios)
+│  │  │  └─ ui/         # Activities, Fragments y Adapters (cliente y admin)
+│  │  ├─ res/           # Layouts XML, drawables, menús, temas y strings
+│  │  └─ AndroidManifest.xml
+│  └─ build.gradle.kts  # Configuración del módulo (Retrofit, ViewBinding, etc.)
+│
+├─ gradle/              # Wrapper y catálogos de versiones
+├─ build.gradle.kts     # Build principal del proyecto
+└─ settings.gradle.kts  # Declaración del módulo :app
 
-Estados utilizados:
-- Cliente: en proceso, pendiente
-- Admin: aceptado, rechazado
-
-IMÁGENES
-- Subir archivo	POST	/upload/image
-Las imágenes quedan almacenadas en Xano (Files).
-
-5. Instalación y Configuración del Proyecto
+Instalación y ejecución
 Requisitos
 
-- Android Studio Ladybug o superior
-- SDK 24+
-- Emulador o dispositivo físico Android
+Android Studio Ladybug o superior
 
-Pasos para compilar
+JDK 17
 
-- Clonar el repositorio:
-git clone https://github.com/Vi-lineros/PurrfectStore2.git
+Android SDK 24+
 
-- Abrir en Android Studio.
-- Esperar a que Gradle sincronice.
-- No requiere claves ni archivos secretos.
-- Ejecutar en emulador o dispositivo físico.
+Pasos
 
-6. Credenciales de Prueba
+Clonar repo:
+
+git clone https://github.com/Vi-lineros/PurrfectStore2
+
+
+Abrir en Android Studio
+
+Sincronizar Gradle
+
+Ejecutar app en emulador o dispositivo
+
+Credenciales de prueba
 
 Administrador
-- Correo: admin@gmail.com
-- Contraseña: admin123
+Correo: admin@gmail.com
+Contraseña: admin123
 
 Cliente
-- Correo: cliente@gmail.com
-- Contraseña: cliente123
+Correo: cliente@gmail.com
+Contraseña: cliente123
 
-7. Funcionalidades Implementadas
-
-Cliente
-
-✔ Buscar y listar productos
-
-✔ Ver detalles del producto
-
-✔ Agregar al carrito
-
-✔ Editar cantidades
-
-✔ Eliminar ítems del carrito
-
-✔ Pago simulado
-
-✔ Solicitar envío (estado: pendiente)
-
-✔ Ver estado de pedido
-
-✔ Editar perfil
-
-✔ Cerrar sesión
-
-Admin
-
-✔ Crear productos
-
-✔ Editar productos
-
-✔ Eliminar productos
-
-✔ Subir múltiples imágenes
-
-✔ Listar productos
-
-✔ Crear / editar / eliminar usuarios
-
-✔ Bloquear usuarios
-
-✔ Ver solicitudes de pagos/envíos
-
-✔ Actualizar estado de la orden (aceptado / rechazado)
-
-✔ Cerrar sesión
-
-8. Arquitectura General
-
-El proyecto utiliza:
-
-- DrawerActivity como contenedor principal
-- Fragments para las pantallas
-- Managers para comunicación con Retrofit
-- SharedPreferences para token, rol y estado de sesión
-- RecyclerView para productos, usuarios y carritos/órdenes
-
-9. Funcionamiento de la Sesión
-
-- Al iniciar sesión se guarda el token y el rol.
-- Desde el Splash se redirige automáticamente según el rol.
-- El logout limpia completamente las SharedPreferences.
-
-10. Subida de Imágenes
-
-- Envío de archivos por multipart/form-data.
-- Xano retorna la URL pública.
-- La app guarda la URL asociada a cada producto.
-
-11. APK
-
+APK
+Descargar APK:
 https://github.com/Vi-lineros/PurrfectStore2/releases/download/v1.0/app-release.apk
 
-12. Autor
+Autor
 
 Vicente Lineros
 Duoc UC — Ingeniería Informática
